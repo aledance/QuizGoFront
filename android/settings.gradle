@@ -1,0 +1,56 @@
+pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        file("local.properties").withReader("UTF-8") { reader ->
+            properties.load(reader)
+        }
+        def flutterSdk = properties.getProperty("flutter.sdk")
+        assert flutterSdk != null, "flutter.sdk not set in local.properties"
+        return flutterSdk
+    }()
+
+    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+
+    repositories {
+        google()
+        mavenCentral()
+        // Allow resolving Gradle plugins/artifacts that may be hosted by Flutter
+        // (e.g., during plugin development). Also include Flutter public repo.
+        maven {
+            url 'https://storage.googleapis.com/download.flutter.io'
+        }
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        // Flutter engine artifacts (debug/release embedding and AARs) are
+        // published either to the Flutter SDK local cache or to the public
+        // Google Cloud storage. Add both locations so Gradle can resolve
+        // io.flutter:* artifacts used during Android builds.
+        // Local engine artifacts cached in the Flutter SDK:
+        def flutterSdkPath = {
+            def properties = new Properties()
+            file("local.properties").withReader("UTF-8") { reader ->
+                properties.load(reader)
+            }
+            return properties.getProperty("flutter.sdk")
+        }()
+        if (flutterSdkPath != null) {
+            maven {
+                url = uri("${flutterSdkPath}/bin/cache/artifacts/engine/android")
+            }
+        }
+        // Public Flutter artifacts repository (fallback):
+        maven {
+            url 'https://storage.googleapis.com/download.flutter.io'
+        }
+    }
+}
+
+rootProject.name = "android"
+include ":app"
