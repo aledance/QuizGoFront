@@ -11,6 +11,11 @@ class UniqueId {
     );
   }
 
+  /// Permite crear un UniqueId a partir de un String existente (ej. desde una API).
+  factory UniqueId.fromUniqueString(String uniqueId) {
+    return UniqueId._(uniqueId);
+  }
+
   const UniqueId._(this.value);
 
   @override
