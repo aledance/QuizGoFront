@@ -1,0 +1,14 @@
+
+import 'package:flutter_application_1/domain/quiz/entities/quiz.dart';
+import 'package:flutter_application_1/domain/quiz/value_objects.dart';
+
+abstract class QuizRepository {
+  /// Returns the quiz identified by [id] or throws DomainNotFound if not found.
+  Future<Quiz> getById(QuizId id);
+
+  /// Persists the [quiz] (create or update).
+  Future<void> save(Quiz quiz);
+
+  // You can add domain-specific queries:
+  Future<List<Quiz>> findPublishedQuizzes();
+}
