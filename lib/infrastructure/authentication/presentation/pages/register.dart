@@ -68,17 +68,17 @@ class RegisterPage extends StatelessWidget {
   Widget _buildRegistrationForm() {
     return Column(
       children: [
-        // Campo de Correo Electrónico
-        _AuthInputField(
-          icon: Icons.email,
-          hintText: 'Correo Electrónico',
-        ),
-        const SizedBox(height: 15),
-
         // Campo de Nombre de Usuario
         _AuthInputField(
           icon: Icons.person,
           hintText: 'Nombre de Usuario',
+        ),
+        const SizedBox(height: 15),
+
+        // Campo de Correo Electrónico
+        _AuthInputField(
+          icon: Icons.email,
+          hintText: 'Correo Electrónico',
         ),
         const SizedBox(height: 15),
 
