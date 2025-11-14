@@ -40,11 +40,15 @@ dependencyResolutionManagement {
             }
             return properties.getProperty("flutter.sdk")
         }()
-        if (flutterSdkPath != null) {
-            maven {
-                url = uri("${flutterSdkPath}/bin/cache/artifacts/engine/android")
-            }
-        }
+        // Note: some SDK layouts place engine artifacts in per-arch folders
+        // which can make the local engine maven repo incomplete. Prefer the
+        // public Flutter artifacts repository to ensure Gradle can download
+        // the required io.flutter AARs.
+//        if (flutterSdkPath != null) {
+//            maven {
+//                url = uri("${flutterSdkPath}/bin/cache/artifacts/engine/android")
+//            }
+//        }
         // Public Flutter artifacts repository (fallback):
         maven {
             url 'https://storage.googleapis.com/download.flutter.io'

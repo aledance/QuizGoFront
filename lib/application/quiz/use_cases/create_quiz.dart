@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:flutter_application_1/domain/quiz/entities/author.dart';
 import 'package:flutter_application_1/domain/quiz/entities/quiz.dart';
+import 'package:flutter_application_1/domain/quiz/entities/question.dart';
 import 'package:flutter_application_1/domain/quiz/repositories/quiz_failure.dart';
 import 'package:flutter_application_1/domain/quiz/repositories/quiz_repository.dart';
 import 'package:flutter_application_1/domain/quiz/value_objects/quiz_description.dart';
@@ -18,6 +19,7 @@ class CreateQuiz {
     required String description,
     required Visibility visibility,
     required Author author,
+    List<Question>? questions,
   }) async {
     final newQuiz = Quiz(
       id: UniqueId(),
@@ -26,7 +28,7 @@ class CreateQuiz {
       visibility: visibility,
       author: author,
       createdAt: DateTime.now(),
-      questions: [],
+      questions: questions ?? [],
     );
 
     return _quizRepository.create(newQuiz);
