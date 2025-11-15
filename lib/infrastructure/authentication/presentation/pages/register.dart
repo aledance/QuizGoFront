@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// Asumiendo que has creado el archivo de colores
+import './login.dart';
 import '/core/utils/colors.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -50,7 +50,12 @@ class RegisterPage extends StatelessWidget {
                 // 4. Botón de Navegación a Login
                 TextButton(
                   onPressed: () {
-                    // Acción para navegar a la página de Login
+                    // Navega a LoginPage y reemplaza la pantalla actual en el stack.
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                    );
                   },
                   child: const Text(
                     '¿Ya tienes cuenta? Inicia sesión',

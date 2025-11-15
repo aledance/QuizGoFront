@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'QuizGo!',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // Puedes definir un tema global si lo deseas
         primarySwatch: Colors.purple,

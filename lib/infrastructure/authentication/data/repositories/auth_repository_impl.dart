@@ -5,7 +5,7 @@ import '../../../../core/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSource remoteDataSource;
+  final AuthRepository remoteDataSource;
 
   AuthRepositoryImpl({required this.remoteDataSource});
 
@@ -13,7 +13,19 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> register(String email, String username, String password) async {
     try {
       // Llama a la infraestructura (DataSource que usa el Endpoint)
-      await remoteDataSource.registerUser(email, username, password);
+      await remoteDataSource.register(email, username, password);
+    } catch (e) {
+      // Traduce la excepción de infraestructura a una excepción de dominio
+      throw DomainRegistrationError('Error de registro. Intente más tarde.');
+    }
+  }
+
+  @override
+  Future<String> login(String emailUsername, String password) async {
+    try {
+      final String token = await remoteDataSource.login(emailUsername, password);
+      // 2. Retorna el token a la capa que llamó al repositorio (UseCase)
+      return token;
     } catch (e) {
       // Traduce la excepción de infraestructura a una excepción de dominio
       throw DomainRegistrationError('Error de registro. Intente más tarde.');

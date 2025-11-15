@@ -9,11 +9,11 @@ abstract class AuthRepository {
   /// Lanza un [DomainRegistrationError] si el proceso de registro falla
   /// por cualquier motivo en la capa de datos o infraestructura.
   Future<void> register(String email, String username, String password);
+  Future<String> login(String email, String password); //falta implementar el usuario
 
 // Aquí podrías añadir otros métodos relacionados con la autenticación en el futuro,
 // como por ejemplo:
 //
-// Future<User> login(String email, String password);
 // Future<void> logout();
 }
 
