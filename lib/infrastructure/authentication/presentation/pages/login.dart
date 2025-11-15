@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 // Asegúrate de importar tus archivos necesarios
+// Las siguientes 3 importaciones no son estrictamente necesarias para esta simulación, pero las mantenemos
 import 'package:flutter_application_1/core/repositories/auth_repository.dart';
 import 'package:flutter_application_1/infrastructure/authentication/data/repositories/auth_repository_impl.dart';
 import 'package:flutter_application_1/infrastructure/authentication/data/datasources/auth_remote_data_source.dart';
 import 'package:http/http.dart' as http;
 
+// Importaciones para navegación
 import './register.dart';
+import './user_profile.dart';
 import '/core/utils/colors.dart';
 
-// 1. Convertido a StatefulWidget
+
+// Convertido a StatefulWidget
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -17,23 +21,22 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // 2. Controladores para los campos de texto
+  // Controladores para los campos de texto
   final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  // Dependencia del repositorio (esto se debe inyectar con un gestor de dependencias como GetIt o Provider en un proyecto real)
+  // Dependencia del repositorio (no se usará en esta simulación, pero se mantiene la estructura)
   late final AuthRepository authRepository;
 
   @override
   void initState() {
     super.initState();
-    // Inicialización simple para este ejemplo
     authRepository = AuthRepositoryImpl(
       remoteDataSource: AuthRemoteDataSourceImpl(client: http.Client()),
     );
   }
 
-  // 3. Método para manejar la lógica de login
+  // <<<--- 2. LÓGICA DE LOGIN MODIFICADA
   void _handleLogin() async {
     final identifier = _identifierController.text.trim();
     final password = _passwordController.text.trim();
@@ -46,24 +49,48 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    try {
-      // Llamada al método del repositorio
-      final token = await authRepository.login(identifier, password);
+    // ---- INICIO DE LA SIMULACIÓN ----
+    // Comprueba si las credenciales coinciden con las especificadas
+    if (identifier == 'jrmat@email.com' && password == '123') {
+      // Éxito: Muestra el mensaje emergente
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Inicio de sesión exitoso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
 
-      // Éxito: Navega a la pantalla principal o muestra un mensaje
+      // Navega a la pantalla de perfil, reemplazando la de login
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const ProfilePage()),
+      );
+    } else {
+      // Fallo: Muestra un error de credenciales inválidas
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Credenciales inválidas. Inténtelo de nuevo.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    // ---- FIN DE LA SIMULACIÓN ----
+
+    /*
+    // --- CÓDIGO ORIGINAL DE LA API (AHORA COMENTADO) ---
+    try {
+      final token = await authRepository.login(identifier, password);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Inicio de sesión exitoso! Token: ${token.substring(0, 10)}...')),
       );
-
-      // Ejemplo de navegación a una pantalla de inicio (reemplaza 'HomePage' por tu pantalla principal)
-      // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomePage()));
+      // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const ProfilePage()));
     } catch (e) {
-      // Otros errores (ej. de red)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ocurrió un error inesperado: $e')),
       );
     }
+    */
   }
+  // <<<--- FIN DE LA MODIFICACIÓN
 
   @override
   void dispose() {
@@ -108,7 +135,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                // Se pasa el estado al método de construcción del formulario
                 _buildLoginForm(),
                 const SizedBox(height: 30),
                 TextButton(
@@ -136,14 +162,12 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       children: [
         _AuthInputField(
-          // Asigna el controlador
           controller: _identifierController,
           icon: Icons.person,
           hintText: 'Email o Nombre de Usuario',
         ),
         const SizedBox(height: 15),
         _AuthInputField(
-          // Asigna el controlador
           controller: _passwordController,
           icon: Icons.lock,
           hintText: 'Contraseña',
@@ -154,7 +178,6 @@ class _LoginPageState extends State<LoginPage> {
           width: double.infinity,
           height: 55,
           child: ElevatedButton(
-            // 4. Llama al método _handleLogin
             onPressed: _handleLogin,
             style: ElevatedButton.styleFrom(
               backgroundColor: accentPink,
@@ -178,17 +201,17 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-// 5. Modifica _AuthInputField para aceptar un controlador
+// Modifica _AuthInputField para aceptar un controlador
 class _AuthInputField extends StatelessWidget {
   final IconData icon;
   final String hintText;
   final bool isPassword;
-  final TextEditingController controller; // Añadido
+  final TextEditingController controller;
 
   const _AuthInputField({
     required this.icon,
     required this.hintText,
-    required this.controller, // Añadido
+    required this.controller,
     this.isPassword = false,
   });
 
@@ -202,7 +225,7 @@ class _AuthInputField extends StatelessWidget {
         border: Border.all(color: Colors.white38),
       ),
       child: TextField(
-        controller: controller, // Asignado
+        controller: controller,
         obscureText: isPassword,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
