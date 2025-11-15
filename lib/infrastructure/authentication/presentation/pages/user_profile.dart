@@ -1,25 +1,25 @@
+// lib/infrastructure/authentication/presentation/pages/user_profile.dart
+
 import 'package:flutter/material.dart';
-// Asegúrate de importar tu archivo de colores y las páginas de login/register
+// Asegúrate de importar tus archivos necesarios
 import '/core/utils/colors.dart';
+import '/domain/user/models/user.dart'; // <<<--- 1. IMPORTA EL MODELO USER
 import '/infrastructure/authentication/presentation/pages/login.dart';
 
 class ProfilePage extends StatelessWidget {
-  // En una aplicación real, recibirías el objeto User aquí.
-  // const ProfilePage({super.key, required this.user});
-  // final User user;
+  // <<<--- 2. AÑADE LA PROPIEDAD PARA RECIBIR EL USUARIO
+  final User user;
 
-  const ProfilePage({super.key});
+  // <<<--- 3. ACTUALIZA EL CONSTRUCTOR PARA REQUERIR EL USUARIO
+  const ProfilePage({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
-    // Datos de ejemplo. Deberían venir del estado de la app o de un objeto User.
-    const String username = 'jrmat';
-    const String email = 'jrmat@email.com';
+    // Datos de ejemplo (se eliminan o se usan como fallback)
     const int gamesPlayed = 128;
     const int gamesWon = 76;
 
     return Scaffold(
-      // 1. Mismo fondo de gradiente para mantener la consistencia visual.
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
@@ -33,7 +33,6 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              // Botón para volver o cerrar (opcional)
               Align(
                 alignment: Alignment.topLeft,
                 child: IconButton(
@@ -42,8 +41,6 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // 2. Avatar del Usuario
               const CircleAvatar(
                 radius: 60,
                 backgroundColor: accentPink,
@@ -55,9 +52,9 @@ class ProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // 3. Nombre de Usuario y Correo
+              // <<<--- 4. USA LOS DATOS REALES DEL USUARIO
               Text(
-                username,
+                user.username, // Usa el username del objeto user
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 28,
@@ -66,19 +63,15 @@ class ProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                email,
+                user.email, // Usa el email del objeto user
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 18,
                 ),
               ),
               const SizedBox(height: 40),
-
-              // 4. Sección de Estadísticas
               _buildStatsSection(gamesPlayed, gamesWon),
-              const Spacer(), // Empuja el botón de logout hacia abajo
-
-              // 5. Botón de Cerrar Sesión
+              const Spacer(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 40.0),
                 child: SizedBox(
@@ -86,15 +79,13 @@ class ProfilePage extends StatelessWidget {
                   height: 55,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Lógica para cerrar sesión
-                      // Navega a la página de login y elimina todas las rutas anteriores
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => const LoginPage()),
                             (Route<dynamic> route) => false,
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: accentPink, // Mismo color de acento
+                      backgroundColor: accentPink,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -118,7 +109,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // Widget para construir la sección de estadísticas
+// Widget para construir la sección de estadísticas
   Widget _buildStatsSection(int games, int wins) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32.0),

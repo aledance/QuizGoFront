@@ -8,8 +8,9 @@ import 'package:http/http.dart' as http;
 
 // Importaciones para navegación
 import './register.dart';
-import './user_profile.dart';
 import '/core/utils/colors.dart';
+import '/domain/user/models/user.dart';
+import '../../../home/presentation/home.dart';
 
 
 // Convertido a StatefulWidget
@@ -60,9 +61,15 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-      // Navega a la pantalla de perfil, reemplazando la de login
+      // Datos del usuario para pasar a la siguiente pantalla
+      final User user = User(
+        username: 'jrmat',
+        email: 'jrmat@email.com',
+      );
+
+      // Navega a la nueva HomePage, pasando los datos del usuario
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const ProfilePage()),
+        MaterialPageRoute(builder: (_) => HomePage(user: user)),
       );
     } else {
       // Fallo: Muestra un error de credenciales inválidas
