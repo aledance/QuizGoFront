@@ -1,7 +1,5 @@
-// lib/infrastructure/quiz/quiz_dto.dart
-// ignore_for_file: invalid_annotation_target
-
-import 'package:freezed_annotation/freezed_annotation.dart';
+// DTOs implemented without Freezed to avoid depending on code generation.
+// These classes are simple containers with toJson/fromJson and mapping to domain.
 import 'package:flutter_application_1/domain/quiz/entities/author.dart' as domain;
 import 'package:flutter_application_1/domain/quiz/entities/option.dart' as domain;
 import 'package:flutter_application_1/domain/quiz/entities/question.dart' as domain;
@@ -16,131 +14,179 @@ import 'package:flutter_application_1/domain/quiz/value_objects/quiz_theme.dart'
 import 'package:flutter_application_1/domain/quiz/value_objects/unique_id.dart';
 import 'package:flutter_application_1/domain/quiz/value_objects/visibility.dart';
 
-part 'quiz_dto.freezed.dart';
-part 'quiz_dto.g.dart';
+class AuthorDto {
+  final String id;
+  final String name;
 
-@freezed
-abstract class AuthorDto with _$AuthorDto {
-  const AuthorDto._();
-
-  const factory AuthorDto({
-    required String id,
-    required String name,
-  }) = _AuthorDto;
+  AuthorDto({required this.id, required this.name});
 
   factory AuthorDto.fromJson(Map<String, dynamic> json) =>
-      _$AuthorDtoFromJson(json);
+      AuthorDto(id: json['id'] as String, name: json['name'] as String);
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
 
   factory AuthorDto.fromDomain(domain.Author author) {
-    return AuthorDto(
-      id: author.id.value,
-      name: author.name,
-    );
+    return AuthorDto(id: author.id.value, name: author.name);
   }
 
   domain.Author toDomain() {
-    return domain.Author(
-      id: UniqueId.fromUniqueString(id),
-      name: name,
-    );
+    return domain.Author(id: UniqueId.fromUniqueString(id), name: name);
   }
 }
 
-@freezed
-abstract class OptionDto with _$OptionDto {
-  const OptionDto._();
+class OptionDto {
+  final String id;
+  final String? text;
+  final String? mediaId;
+  final bool? isCorrect;
 
-  const factory OptionDto({
-    required String id,
-    required String text,
-  }) = _OptionDto;
+  OptionDto({required this.id, this.text, this.mediaId, this.isCorrect});
 
-  factory OptionDto.fromJson(Map<String, dynamic> json) =>
-      _$OptionDtoFromJson(json);
+  factory OptionDto.fromJson(Map<String, dynamic> json) => OptionDto(
+        id: json['id'] as String,
+        text: json['answerText'] as String?,
+        mediaId: json['mediaId'] as String?,
+        isCorrect: json['isCorrect'] as bool?,
+      );
 
-  factory OptionDto.fromDomain(domain.Option option) {
-    return OptionDto(
-      id: option.id.value,
-      text: option.text.value,
-    );
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'answerText': text,
+        'mediaId': mediaId,
+        'isCorrect': isCorrect,
+      };
+
+  factory OptionDto.fromDomain(domain.Option option, {bool isCorrect = false}) {
+    return OptionDto(id: option.id.value, text: option.text.value, mediaId: null, isCorrect: isCorrect);
   }
 
   domain.Option toDomain() {
-    return domain.Option(
-      id: UniqueId.fromUniqueString(id),
-      text: OptionText(text),
-    );
+    return domain.Option(id: UniqueId.fromUniqueString(id), text: OptionText(text ?? ''));
   }
 }
 
-@freezed
-abstract class QuestionDto with _$QuestionDto {
-  const QuestionDto._();
+class QuestionDto {
+  final String id;
+  final String questionText;
+  final String? mediaId;
+  final String? questionType;
+  final int? timeLimit;
+  final int? points;
+  final List<OptionDto> answers;
 
-  const factory QuestionDto({
-    required String id,
-    required String statement,
-    required List<OptionDto> options,
-    required String correctOptionId,
-  }) = _QuestionDto;
+  QuestionDto({
+    required this.id,
+    required this.questionText,
+    this.mediaId,
+    this.questionType,
+    this.timeLimit,
+    this.points,
+    required this.answers,
+  });
 
-  factory QuestionDto.fromJson(Map<String, dynamic> json) =>
-      _$QuestionDtoFromJson(json);
+  factory QuestionDto.fromJson(Map<String, dynamic> json) => QuestionDto(
+        id: json['id'] as String,
+        questionText: json['questionText'] as String,
+        mediaId: json['mediaId'] as String?,
+        questionType: json['questionType'] as String?,
+        timeLimit: json['timeLimit'] as int?,
+        points: json['points'] as int?,
+        answers: (json['answers'] as List<dynamic>).map((e) => OptionDto.fromJson(e as Map<String, dynamic>)).toList(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'questionText': questionText,
+        'mediaId': mediaId,
+        'questionType': questionType,
+        'timeLimit': timeLimit,
+        'points': points,
+        'answers': answers.map((a) => a.toJson()).toList(),
+      };
 
   factory QuestionDto.fromDomain(domain.Question question) {
     return QuestionDto(
       id: question.id.value,
-      statement: question.statement.value,
-      options: question.options.map((o) => OptionDto.fromDomain(o)).toList(),
-      correctOptionId: question.correctOption.id.value,
+      questionText: question.statement.value,
+      mediaId: null,
+      questionType: 'quiz',
+      timeLimit: 30,
+      points: 100,
+      answers: question.options.map((o) => OptionDto.fromDomain(o, isCorrect: o.id.value == question.correctOption.id.value)).toList(),
     );
   }
 
   domain.Question toDomain() {
-    final domainOptions = options.map((dto) => dto.toDomain()).toList();
+    final domainOptions = answers.map((dto) => dto.toDomain()).toList();
     final correct = domainOptions.firstWhere(
-      (o) => o.id.value == correctOptionId,
+      (o) => answers.firstWhere((a) => a.id == o.id.value).isCorrect == true,
       orElse: () => domainOptions.isNotEmpty ? domainOptions.first : throw StateError('No options available'),
     );
 
-    return domain.Question(
-      id: UniqueId.fromUniqueString(id),
-      statement: QuestionStatement(statement),
-      options: domainOptions,
-      correctOption: correct,
-    );
+    return domain.Question(id: UniqueId.fromUniqueString(id), statement: QuestionStatement(questionText), options: domainOptions, correctOption: correct);
   }
 }
 
-@freezed
-abstract class QuizDto with _$QuizDto {
-  const QuizDto._();
+class QuizDto {
+  final String id;
+  final String title;
+  final String? description;
+  final String? coverImageId;
+  final String visibility;
+  final String? themeId;
+  final AuthorDto author;
+  final DateTime createdAt;
+  final int? playCount;
+  final List<QuestionDto> questions;
 
-  @JsonSerializable(explicitToJson: true)
-  const factory QuizDto({
-    required String id,
-    required String name,
-    String? description,
-    @JsonKey(name: 'kahoot_image_url') String? kahootImageUrl,
-    required String visibility,
-    List<String>? themes,
-    required AuthorDto author,
-    @JsonKey(name: 'created_at') required DateTime createdAt,
-    @JsonKey(name: 'play_count') int? playCount,
-    required List<QuestionDto> questions,
-  }) = _QuizDto;
+  QuizDto({
+    required this.id,
+    required this.title,
+    this.description,
+    this.coverImageId,
+    required this.visibility,
+    this.themeId,
+    required this.author,
+    required this.createdAt,
+    this.playCount,
+    required this.questions,
+  });
 
-  factory QuizDto.fromJson(Map<String, dynamic> json) =>
-      _$QuizDtoFromJson(json);
+  factory QuizDto.fromJson(Map<String, dynamic> json) => QuizDto(
+        id: json['id'] as String,
+        title: json['title'] as String,
+        description: json['description'] as String?,
+        coverImageId: json['coverImageId'] as String?,
+        visibility: json['visibility'] as String,
+        themeId: json['themeId'] as String?,
+        author: AuthorDto.fromJson(json['author'] as Map<String, dynamic>),
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        playCount: json['playCount'] as int?,
+        questions: (json['questions'] as List<dynamic>).map((e) => QuestionDto.fromJson(e as Map<String, dynamic>)).toList(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'coverImageId': coverImageId,
+        'visibility': visibility,
+        'themeId': themeId,
+        'author': author.toJson(),
+        'createdAt': createdAt.toIso8601String(),
+        'playCount': playCount,
+        'questions': questions.map((q) => q.toJson()).toList(),
+      };
 
   factory QuizDto.fromDomain(domain.Quiz quiz) {
+    final themeId = (quiz.themes != null && quiz.themes!.isNotEmpty) ? quiz.themes!.first.value : null;
     return QuizDto(
       id: quiz.id.value,
-      name: quiz.name.value,
+      title: quiz.name.value,
       description: quiz.description.value,
-      kahootImageUrl: quiz.kahootImage?.value,
+      coverImageId: null,
       visibility: quiz.visibility.name,
-      themes: quiz.themes?.map((t) => t.value).toList(),
+      themeId: themeId,
       author: AuthorDto.fromDomain(quiz.author),
       createdAt: quiz.createdAt,
       playCount: quiz.playCount?.value,
@@ -151,11 +197,11 @@ abstract class QuizDto with _$QuizDto {
   domain.Quiz toDomain() {
     return domain.Quiz(
       id: UniqueId.fromUniqueString(id),
-      name: QuizName(name),
+      name: QuizName(title),
       description: QuizDescription(description ?? ''),
-      kahootImage: kahootImageUrl == null ? null : ImageUrl(kahootImageUrl!),
+      kahootImage: coverImageId == null ? null : ImageUrl(coverImageId!),
       visibility: Visibility.values.firstWhere((e) => e.name == visibility),
-      themes: themes?.map((t) => QuizTheme(t)).toList(),
+      themes: themeId == null ? null : [QuizTheme(themeId!)],
       author: author.toDomain(),
       createdAt: createdAt,
       playCount: playCount == null ? null : PlayCount(playCount!),

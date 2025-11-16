@@ -1,9 +1,18 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+/// Simple replacement for Freezed union used for failures.
+class QuizFailure {
+  final String _type;
 
-part 'quiz_failure.freezed.dart';
+  const QuizFailure._(this._type);
 
-@freezed
-abstract class QuizFailure with _$QuizFailure {
-  const factory QuizFailure.notFound() = NotFound;
-  const factory QuizFailure.serverError() = ServerError;
+  /// Failure when a resource is not found (404)
+  factory QuizFailure.notFound() => const QuizFailure._('notFound');
+
+  /// Generic server error
+  factory QuizFailure.serverError() => const QuizFailure._('serverError');
+
+  bool get isNotFound => _type == 'notFound';
+  bool get isServerError => _type == 'serverError';
+
+  @override
+  String toString() => 'QuizFailure($_type)';
 }

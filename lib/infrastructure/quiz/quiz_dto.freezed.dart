@@ -1,47 +1,7 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-// coverage:ignore-file
-// ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
-
-part of 'quiz_dto.dart';
-
-// **************************************************************************
-// FreezedGenerator
-// **************************************************************************
-
-// dart format off
-T _$identity<T>(T value) => value;
-
-/// @nodoc
-mixin _$AuthorDto {
-
- String get id; String get name;
-/// Create a copy of AuthorDto
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$AuthorDtoCopyWith<AuthorDto> get copyWith => _$AuthorDtoCopyWithImpl<AuthorDto>(this as AuthorDto, _$identity);
-
-  /// Serializes this AuthorDto to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthorDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,name);
-
-@override
-String toString() {
-  return 'AuthorDto(id: $id, name: $name)';
-}
-
-
-}
+// Freezed-generated file intentionally removed.
+// The DTOs (AuthorDto, OptionDto, QuestionDto, QuizDto) are implemented
+// manually in `quiz_dto.dart`. Keeping this placeholder prevents accidental
+// re-introduction of Freezed-generated code. No code should live here.
 
 /// @nodoc
 abstract mixin class $AuthorDtoCopyWith<$Res>  {
@@ -281,7 +241,7 @@ as String,
 /// @nodoc
 mixin _$OptionDto {
 
- String get id; String get text;
+ String get id;@JsonKey(name: 'answerText') String? get text;@JsonKey(name: 'mediaId') String? get mediaId;@JsonKey(name: 'isCorrect') bool? get isCorrect;
 /// Create a copy of OptionDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -294,16 +254,16 @@ $OptionDtoCopyWith<OptionDto> get copyWith => _$OptionDtoCopyWithImpl<OptionDto>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OptionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.text, text) || other.text == text));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OptionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.text, text) || other.text == text)&&(identical(other.mediaId, mediaId) || other.mediaId == mediaId)&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,text);
+int get hashCode => Object.hash(runtimeType,id,text,mediaId,isCorrect);
 
 @override
 String toString() {
-  return 'OptionDto(id: $id, text: $text)';
+  return 'OptionDto(id: $id, text: $text, mediaId: $mediaId, isCorrect: $isCorrect)';
 }
 
 
@@ -314,7 +274,7 @@ abstract mixin class $OptionDtoCopyWith<$Res>  {
   factory $OptionDtoCopyWith(OptionDto value, $Res Function(OptionDto) _then) = _$OptionDtoCopyWithImpl;
 @useResult
 $Res call({
- String id, String text
+ String id,@JsonKey(name: 'answerText') String? text,@JsonKey(name: 'mediaId') String? mediaId,@JsonKey(name: 'isCorrect') bool? isCorrect
 });
 
 
@@ -331,11 +291,13 @@ class _$OptionDtoCopyWithImpl<$Res>
 
 /// Create a copy of OptionDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? text = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? text = freezed,Object? mediaId = freezed,Object? isCorrect = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
-as String,
+as String,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String?,mediaId: freezed == mediaId ? _self.mediaId : mediaId // ignore: cast_nullable_to_non_nullable
+as String?,isCorrect: freezed == isCorrect ? _self.isCorrect : isCorrect // ignore: cast_nullable_to_non_nullable
+as bool?,
   ));
 }
 
@@ -420,10 +382,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String text)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'answerText')  String? text, @JsonKey(name: 'mediaId')  String? mediaId, @JsonKey(name: 'isCorrect')  bool? isCorrect)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _OptionDto() when $default != null:
-return $default(_that.id,_that.text);case _:
+return $default(_that.id,_that.text,_that.mediaId,_that.isCorrect);case _:
   return orElse();
 
 }
@@ -441,10 +403,10 @@ return $default(_that.id,_that.text);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String text)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'answerText')  String? text, @JsonKey(name: 'mediaId')  String? mediaId, @JsonKey(name: 'isCorrect')  bool? isCorrect)  $default,) {final _that = this;
 switch (_that) {
 case _OptionDto():
-return $default(_that.id,_that.text);case _:
+return $default(_that.id,_that.text,_that.mediaId,_that.isCorrect);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -461,10 +423,10 @@ return $default(_that.id,_that.text);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String text)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'answerText')  String? text, @JsonKey(name: 'mediaId')  String? mediaId, @JsonKey(name: 'isCorrect')  bool? isCorrect)?  $default,) {final _that = this;
 switch (_that) {
 case _OptionDto() when $default != null:
-return $default(_that.id,_that.text);case _:
+return $default(_that.id,_that.text,_that.mediaId,_that.isCorrect);case _:
   return null;
 
 }
@@ -476,11 +438,13 @@ return $default(_that.id,_that.text);case _:
 @JsonSerializable()
 
 class _OptionDto extends OptionDto {
-  const _OptionDto({required this.id, required this.text}): super._();
+  const _OptionDto({required this.id, @JsonKey(name: 'answerText') this.text, @JsonKey(name: 'mediaId') this.mediaId, @JsonKey(name: 'isCorrect') this.isCorrect}): super._();
   factory _OptionDto.fromJson(Map<String, dynamic> json) => _$OptionDtoFromJson(json);
 
 @override final  String id;
-@override final  String text;
+@override@JsonKey(name: 'answerText') final  String? text;
+@override@JsonKey(name: 'mediaId') final  String? mediaId;
+@override@JsonKey(name: 'isCorrect') final  bool? isCorrect;
 
 /// Create a copy of OptionDto
 /// with the given fields replaced by the non-null parameter values.
@@ -495,16 +459,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OptionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.text, text) || other.text == text));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OptionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.text, text) || other.text == text)&&(identical(other.mediaId, mediaId) || other.mediaId == mediaId)&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,text);
+int get hashCode => Object.hash(runtimeType,id,text,mediaId,isCorrect);
 
 @override
 String toString() {
-  return 'OptionDto(id: $id, text: $text)';
+  return 'OptionDto(id: $id, text: $text, mediaId: $mediaId, isCorrect: $isCorrect)';
 }
 
 
@@ -515,7 +479,7 @@ abstract mixin class _$OptionDtoCopyWith<$Res> implements $OptionDtoCopyWith<$Re
   factory _$OptionDtoCopyWith(_OptionDto value, $Res Function(_OptionDto) _then) = __$OptionDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String text
+ String id,@JsonKey(name: 'answerText') String? text,@JsonKey(name: 'mediaId') String? mediaId,@JsonKey(name: 'isCorrect') bool? isCorrect
 });
 
 
@@ -532,11 +496,13 @@ class __$OptionDtoCopyWithImpl<$Res>
 
 /// Create a copy of OptionDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? text = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? text = freezed,Object? mediaId = freezed,Object? isCorrect = freezed,}) {
   return _then(_OptionDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
-as String,
+as String,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String?,mediaId: freezed == mediaId ? _self.mediaId : mediaId // ignore: cast_nullable_to_non_nullable
+as String?,isCorrect: freezed == isCorrect ? _self.isCorrect : isCorrect // ignore: cast_nullable_to_non_nullable
+as bool?,
   ));
 }
 
@@ -547,7 +513,7 @@ as String,
 /// @nodoc
 mixin _$QuestionDto {
 
- String get id; String get statement; List<OptionDto> get options; String get correctOptionId;
+ String get id;@JsonKey(name: 'questionText') String get questionText;@JsonKey(name: 'mediaId') String? get mediaId;@JsonKey(name: 'questionType') String? get questionType;@JsonKey(name: 'timeLimit') int? get timeLimit;@JsonKey(name: 'points') int? get points;@JsonKey(name: 'answers') List<OptionDto> get answers;
 /// Create a copy of QuestionDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -560,16 +526,16 @@ $QuestionDtoCopyWith<QuestionDto> get copyWith => _$QuestionDtoCopyWithImpl<Ques
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is QuestionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.statement, statement) || other.statement == statement)&&const DeepCollectionEquality().equals(other.options, options)&&(identical(other.correctOptionId, correctOptionId) || other.correctOptionId == correctOptionId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is QuestionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.questionText, questionText) || other.questionText == questionText)&&(identical(other.mediaId, mediaId) || other.mediaId == mediaId)&&(identical(other.questionType, questionType) || other.questionType == questionType)&&(identical(other.timeLimit, timeLimit) || other.timeLimit == timeLimit)&&(identical(other.points, points) || other.points == points)&&const DeepCollectionEquality().equals(other.answers, answers));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,statement,const DeepCollectionEquality().hash(options),correctOptionId);
+int get hashCode => Object.hash(runtimeType,id,questionText,mediaId,questionType,timeLimit,points,const DeepCollectionEquality().hash(answers));
 
 @override
 String toString() {
-  return 'QuestionDto(id: $id, statement: $statement, options: $options, correctOptionId: $correctOptionId)';
+  return 'QuestionDto(id: $id, questionText: $questionText, mediaId: $mediaId, questionType: $questionType, timeLimit: $timeLimit, points: $points, answers: $answers)';
 }
 
 
@@ -580,7 +546,7 @@ abstract mixin class $QuestionDtoCopyWith<$Res>  {
   factory $QuestionDtoCopyWith(QuestionDto value, $Res Function(QuestionDto) _then) = _$QuestionDtoCopyWithImpl;
 @useResult
 $Res call({
- String id, String statement, List<OptionDto> options, String correctOptionId
+ String id,@JsonKey(name: 'questionText') String questionText,@JsonKey(name: 'mediaId') String? mediaId,@JsonKey(name: 'questionType') String? questionType,@JsonKey(name: 'timeLimit') int? timeLimit,@JsonKey(name: 'points') int? points,@JsonKey(name: 'answers') List<OptionDto> answers
 });
 
 
@@ -597,13 +563,16 @@ class _$QuestionDtoCopyWithImpl<$Res>
 
 /// Create a copy of QuestionDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? statement = null,Object? options = null,Object? correctOptionId = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? questionText = null,Object? mediaId = freezed,Object? questionType = freezed,Object? timeLimit = freezed,Object? points = freezed,Object? answers = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,statement: null == statement ? _self.statement : statement // ignore: cast_nullable_to_non_nullable
-as String,options: null == options ? _self.options : options // ignore: cast_nullable_to_non_nullable
-as List<OptionDto>,correctOptionId: null == correctOptionId ? _self.correctOptionId : correctOptionId // ignore: cast_nullable_to_non_nullable
-as String,
+as String,questionText: null == questionText ? _self.questionText : questionText // ignore: cast_nullable_to_non_nullable
+as String,mediaId: freezed == mediaId ? _self.mediaId : mediaId // ignore: cast_nullable_to_non_nullable
+as String?,questionType: freezed == questionType ? _self.questionType : questionType // ignore: cast_nullable_to_non_nullable
+as String?,timeLimit: freezed == timeLimit ? _self.timeLimit : timeLimit // ignore: cast_nullable_to_non_nullable
+as int?,points: freezed == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
+as int?,answers: null == answers ? _self.answers : answers // ignore: cast_nullable_to_non_nullable
+as List<OptionDto>,
   ));
 }
 
@@ -688,10 +657,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String statement,  List<OptionDto> options,  String correctOptionId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'questionText')  String questionText, @JsonKey(name: 'mediaId')  String? mediaId, @JsonKey(name: 'questionType')  String? questionType, @JsonKey(name: 'timeLimit')  int? timeLimit, @JsonKey(name: 'points')  int? points, @JsonKey(name: 'answers')  List<OptionDto> answers)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _QuestionDto() when $default != null:
-return $default(_that.id,_that.statement,_that.options,_that.correctOptionId);case _:
+return $default(_that.id,_that.questionText,_that.mediaId,_that.questionType,_that.timeLimit,_that.points,_that.answers);case _:
   return orElse();
 
 }
@@ -709,10 +678,10 @@ return $default(_that.id,_that.statement,_that.options,_that.correctOptionId);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String statement,  List<OptionDto> options,  String correctOptionId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'questionText')  String questionText, @JsonKey(name: 'mediaId')  String? mediaId, @JsonKey(name: 'questionType')  String? questionType, @JsonKey(name: 'timeLimit')  int? timeLimit, @JsonKey(name: 'points')  int? points, @JsonKey(name: 'answers')  List<OptionDto> answers)  $default,) {final _that = this;
 switch (_that) {
 case _QuestionDto():
-return $default(_that.id,_that.statement,_that.options,_that.correctOptionId);case _:
+return $default(_that.id,_that.questionText,_that.mediaId,_that.questionType,_that.timeLimit,_that.points,_that.answers);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -729,10 +698,10 @@ return $default(_that.id,_that.statement,_that.options,_that.correctOptionId);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String statement,  List<OptionDto> options,  String correctOptionId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'questionText')  String questionText, @JsonKey(name: 'mediaId')  String? mediaId, @JsonKey(name: 'questionType')  String? questionType, @JsonKey(name: 'timeLimit')  int? timeLimit, @JsonKey(name: 'points')  int? points, @JsonKey(name: 'answers')  List<OptionDto> answers)?  $default,) {final _that = this;
 switch (_that) {
 case _QuestionDto() when $default != null:
-return $default(_that.id,_that.statement,_that.options,_that.correctOptionId);case _:
+return $default(_that.id,_that.questionText,_that.mediaId,_that.questionType,_that.timeLimit,_that.points,_that.answers);case _:
   return null;
 
 }
@@ -744,19 +713,22 @@ return $default(_that.id,_that.statement,_that.options,_that.correctOptionId);ca
 @JsonSerializable()
 
 class _QuestionDto extends QuestionDto {
-  const _QuestionDto({required this.id, required this.statement, required final  List<OptionDto> options, required this.correctOptionId}): _options = options,super._();
+  const _QuestionDto({required this.id, @JsonKey(name: 'questionText') required this.questionText, @JsonKey(name: 'mediaId') this.mediaId, @JsonKey(name: 'questionType') this.questionType, @JsonKey(name: 'timeLimit') this.timeLimit, @JsonKey(name: 'points') this.points, @JsonKey(name: 'answers') required final  List<OptionDto> answers}): _answers = answers,super._();
   factory _QuestionDto.fromJson(Map<String, dynamic> json) => _$QuestionDtoFromJson(json);
 
 @override final  String id;
-@override final  String statement;
- final  List<OptionDto> _options;
-@override List<OptionDto> get options {
-  if (_options is EqualUnmodifiableListView) return _options;
+@override@JsonKey(name: 'questionText') final  String questionText;
+@override@JsonKey(name: 'mediaId') final  String? mediaId;
+@override@JsonKey(name: 'questionType') final  String? questionType;
+@override@JsonKey(name: 'timeLimit') final  int? timeLimit;
+@override@JsonKey(name: 'points') final  int? points;
+ final  List<OptionDto> _answers;
+@override@JsonKey(name: 'answers') List<OptionDto> get answers {
+  if (_answers is EqualUnmodifiableListView) return _answers;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_options);
+  return EqualUnmodifiableListView(_answers);
 }
 
-@override final  String correctOptionId;
 
 /// Create a copy of QuestionDto
 /// with the given fields replaced by the non-null parameter values.
@@ -771,16 +743,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _QuestionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.statement, statement) || other.statement == statement)&&const DeepCollectionEquality().equals(other._options, _options)&&(identical(other.correctOptionId, correctOptionId) || other.correctOptionId == correctOptionId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _QuestionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.questionText, questionText) || other.questionText == questionText)&&(identical(other.mediaId, mediaId) || other.mediaId == mediaId)&&(identical(other.questionType, questionType) || other.questionType == questionType)&&(identical(other.timeLimit, timeLimit) || other.timeLimit == timeLimit)&&(identical(other.points, points) || other.points == points)&&const DeepCollectionEquality().equals(other._answers, _answers));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,statement,const DeepCollectionEquality().hash(_options),correctOptionId);
+int get hashCode => Object.hash(runtimeType,id,questionText,mediaId,questionType,timeLimit,points,const DeepCollectionEquality().hash(_answers));
 
 @override
 String toString() {
-  return 'QuestionDto(id: $id, statement: $statement, options: $options, correctOptionId: $correctOptionId)';
+  return 'QuestionDto(id: $id, questionText: $questionText, mediaId: $mediaId, questionType: $questionType, timeLimit: $timeLimit, points: $points, answers: $answers)';
 }
 
 
@@ -791,7 +763,7 @@ abstract mixin class _$QuestionDtoCopyWith<$Res> implements $QuestionDtoCopyWith
   factory _$QuestionDtoCopyWith(_QuestionDto value, $Res Function(_QuestionDto) _then) = __$QuestionDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String statement, List<OptionDto> options, String correctOptionId
+ String id,@JsonKey(name: 'questionText') String questionText,@JsonKey(name: 'mediaId') String? mediaId,@JsonKey(name: 'questionType') String? questionType,@JsonKey(name: 'timeLimit') int? timeLimit,@JsonKey(name: 'points') int? points,@JsonKey(name: 'answers') List<OptionDto> answers
 });
 
 
@@ -808,13 +780,16 @@ class __$QuestionDtoCopyWithImpl<$Res>
 
 /// Create a copy of QuestionDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? statement = null,Object? options = null,Object? correctOptionId = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? questionText = null,Object? mediaId = freezed,Object? questionType = freezed,Object? timeLimit = freezed,Object? points = freezed,Object? answers = null,}) {
   return _then(_QuestionDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,statement: null == statement ? _self.statement : statement // ignore: cast_nullable_to_non_nullable
-as String,options: null == options ? _self._options : options // ignore: cast_nullable_to_non_nullable
-as List<OptionDto>,correctOptionId: null == correctOptionId ? _self.correctOptionId : correctOptionId // ignore: cast_nullable_to_non_nullable
-as String,
+as String,questionText: null == questionText ? _self.questionText : questionText // ignore: cast_nullable_to_non_nullable
+as String,mediaId: freezed == mediaId ? _self.mediaId : mediaId // ignore: cast_nullable_to_non_nullable
+as String?,questionType: freezed == questionType ? _self.questionType : questionType // ignore: cast_nullable_to_non_nullable
+as String?,timeLimit: freezed == timeLimit ? _self.timeLimit : timeLimit // ignore: cast_nullable_to_non_nullable
+as int?,points: freezed == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
+as int?,answers: null == answers ? _self._answers : answers // ignore: cast_nullable_to_non_nullable
+as List<OptionDto>,
   ));
 }
 
@@ -825,7 +800,7 @@ as String,
 /// @nodoc
 mixin _$QuizDto {
 
- String get id; String get name; String? get description;@JsonKey(name: 'kahoot_image_url') String? get kahootImageUrl; String get visibility; List<String>? get themes; AuthorDto get author;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'play_count') int? get playCount; List<QuestionDto> get questions;
+ String get id;@JsonKey(name: 'title') String get title; String? get description;@JsonKey(name: 'coverImageId') String? get coverImageId; String get visibility;@JsonKey(name: 'themeId') String? get themeId; AuthorDto get author;@JsonKey(name: 'createdAt') DateTime get createdAt;@JsonKey(name: 'playCount') int? get playCount; List<QuestionDto> get questions;
 /// Create a copy of QuizDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -838,16 +813,16 @@ $QuizDtoCopyWith<QuizDto> get copyWith => _$QuizDtoCopyWithImpl<QuizDto>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is QuizDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.kahootImageUrl, kahootImageUrl) || other.kahootImageUrl == kahootImageUrl)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&const DeepCollectionEquality().equals(other.themes, themes)&&(identical(other.author, author) || other.author == author)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.playCount, playCount) || other.playCount == playCount)&&const DeepCollectionEquality().equals(other.questions, questions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is QuizDto&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.coverImageId, coverImageId) || other.coverImageId == coverImageId)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.themeId, themeId) || other.themeId == themeId)&&(identical(other.author, author) || other.author == author)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.playCount, playCount) || other.playCount == playCount)&&const DeepCollectionEquality().equals(other.questions, questions));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,kahootImageUrl,visibility,const DeepCollectionEquality().hash(themes),author,createdAt,playCount,const DeepCollectionEquality().hash(questions));
+int get hashCode => Object.hash(runtimeType,id,title,description,coverImageId,visibility,themeId,author,createdAt,playCount,const DeepCollectionEquality().hash(questions));
 
 @override
 String toString() {
-  return 'QuizDto(id: $id, name: $name, description: $description, kahootImageUrl: $kahootImageUrl, visibility: $visibility, themes: $themes, author: $author, createdAt: $createdAt, playCount: $playCount, questions: $questions)';
+  return 'QuizDto(id: $id, title: $title, description: $description, coverImageId: $coverImageId, visibility: $visibility, themeId: $themeId, author: $author, createdAt: $createdAt, playCount: $playCount, questions: $questions)';
 }
 
 
@@ -858,7 +833,7 @@ abstract mixin class $QuizDtoCopyWith<$Res>  {
   factory $QuizDtoCopyWith(QuizDto value, $Res Function(QuizDto) _then) = _$QuizDtoCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String? description,@JsonKey(name: 'kahoot_image_url') String? kahootImageUrl, String visibility, List<String>? themes, AuthorDto author,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'play_count') int? playCount, List<QuestionDto> questions
+ String id,@JsonKey(name: 'title') String title, String? description,@JsonKey(name: 'coverImageId') String? coverImageId, String visibility,@JsonKey(name: 'themeId') String? themeId, AuthorDto author,@JsonKey(name: 'createdAt') DateTime createdAt,@JsonKey(name: 'playCount') int? playCount, List<QuestionDto> questions
 });
 
 
@@ -875,15 +850,15 @@ class _$QuizDtoCopyWithImpl<$Res>
 
 /// Create a copy of QuizDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? kahootImageUrl = freezed,Object? visibility = null,Object? themes = freezed,Object? author = null,Object? createdAt = null,Object? playCount = freezed,Object? questions = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? description = freezed,Object? coverImageId = freezed,Object? visibility = null,Object? themeId = freezed,Object? author = null,Object? createdAt = null,Object? playCount = freezed,Object? questions = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,kahootImageUrl: freezed == kahootImageUrl ? _self.kahootImageUrl : kahootImageUrl // ignore: cast_nullable_to_non_nullable
+as String?,coverImageId: freezed == coverImageId ? _self.coverImageId : coverImageId // ignore: cast_nullable_to_non_nullable
 as String?,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
-as String,themes: freezed == themes ? _self.themes : themes // ignore: cast_nullable_to_non_nullable
-as List<String>?,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as String,themeId: freezed == themeId ? _self.themeId : themeId // ignore: cast_nullable_to_non_nullable
+as String?,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as AuthorDto,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,playCount: freezed == playCount ? _self.playCount : playCount // ignore: cast_nullable_to_non_nullable
 as int?,questions: null == questions ? _self.questions : questions // ignore: cast_nullable_to_non_nullable
@@ -981,10 +956,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? description, @JsonKey(name: 'kahoot_image_url')  String? kahootImageUrl,  String visibility,  List<String>? themes,  AuthorDto author, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'play_count')  int? playCount,  List<QuestionDto> questions)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'title')  String title,  String? description, @JsonKey(name: 'coverImageId')  String? coverImageId,  String visibility, @JsonKey(name: 'themeId')  String? themeId,  AuthorDto author, @JsonKey(name: 'createdAt')  DateTime createdAt, @JsonKey(name: 'playCount')  int? playCount,  List<QuestionDto> questions)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _QuizDto() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.kahootImageUrl,_that.visibility,_that.themes,_that.author,_that.createdAt,_that.playCount,_that.questions);case _:
+return $default(_that.id,_that.title,_that.description,_that.coverImageId,_that.visibility,_that.themeId,_that.author,_that.createdAt,_that.playCount,_that.questions);case _:
   return orElse();
 
 }
@@ -1002,10 +977,10 @@ return $default(_that.id,_that.name,_that.description,_that.kahootImageUrl,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? description, @JsonKey(name: 'kahoot_image_url')  String? kahootImageUrl,  String visibility,  List<String>? themes,  AuthorDto author, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'play_count')  int? playCount,  List<QuestionDto> questions)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'title')  String title,  String? description, @JsonKey(name: 'coverImageId')  String? coverImageId,  String visibility, @JsonKey(name: 'themeId')  String? themeId,  AuthorDto author, @JsonKey(name: 'createdAt')  DateTime createdAt, @JsonKey(name: 'playCount')  int? playCount,  List<QuestionDto> questions)  $default,) {final _that = this;
 switch (_that) {
 case _QuizDto():
-return $default(_that.id,_that.name,_that.description,_that.kahootImageUrl,_that.visibility,_that.themes,_that.author,_that.createdAt,_that.playCount,_that.questions);case _:
+return $default(_that.id,_that.title,_that.description,_that.coverImageId,_that.visibility,_that.themeId,_that.author,_that.createdAt,_that.playCount,_that.questions);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1022,10 +997,10 @@ return $default(_that.id,_that.name,_that.description,_that.kahootImageUrl,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? description, @JsonKey(name: 'kahoot_image_url')  String? kahootImageUrl,  String visibility,  List<String>? themes,  AuthorDto author, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'play_count')  int? playCount,  List<QuestionDto> questions)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'title')  String title,  String? description, @JsonKey(name: 'coverImageId')  String? coverImageId,  String visibility, @JsonKey(name: 'themeId')  String? themeId,  AuthorDto author, @JsonKey(name: 'createdAt')  DateTime createdAt, @JsonKey(name: 'playCount')  int? playCount,  List<QuestionDto> questions)?  $default,) {final _that = this;
 switch (_that) {
 case _QuizDto() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.kahootImageUrl,_that.visibility,_that.themes,_that.author,_that.createdAt,_that.playCount,_that.questions);case _:
+return $default(_that.id,_that.title,_that.description,_that.coverImageId,_that.visibility,_that.themeId,_that.author,_that.createdAt,_that.playCount,_that.questions);case _:
   return null;
 
 }
@@ -1037,26 +1012,18 @@ return $default(_that.id,_that.name,_that.description,_that.kahootImageUrl,_that
 
 @JsonSerializable(explicitToJson: true)
 class _QuizDto extends QuizDto {
-  const _QuizDto({required this.id, required this.name, this.description, @JsonKey(name: 'kahoot_image_url') this.kahootImageUrl, required this.visibility, final  List<String>? themes, required this.author, @JsonKey(name: 'created_at') required this.createdAt, @JsonKey(name: 'play_count') this.playCount, required final  List<QuestionDto> questions}): _themes = themes,_questions = questions,super._();
+  const _QuizDto({required this.id, @JsonKey(name: 'title') required this.title, this.description, @JsonKey(name: 'coverImageId') this.coverImageId, required this.visibility, @JsonKey(name: 'themeId') this.themeId, required this.author, @JsonKey(name: 'createdAt') required this.createdAt, @JsonKey(name: 'playCount') this.playCount, required final  List<QuestionDto> questions}): _questions = questions,super._();
   factory _QuizDto.fromJson(Map<String, dynamic> json) => _$QuizDtoFromJson(json);
 
 @override final  String id;
-@override final  String name;
+@override@JsonKey(name: 'title') final  String title;
 @override final  String? description;
-@override@JsonKey(name: 'kahoot_image_url') final  String? kahootImageUrl;
+@override@JsonKey(name: 'coverImageId') final  String? coverImageId;
 @override final  String visibility;
- final  List<String>? _themes;
-@override List<String>? get themes {
-  final value = _themes;
-  if (value == null) return null;
-  if (_themes is EqualUnmodifiableListView) return _themes;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(value);
-}
-
+@override@JsonKey(name: 'themeId') final  String? themeId;
 @override final  AuthorDto author;
-@override@JsonKey(name: 'created_at') final  DateTime createdAt;
-@override@JsonKey(name: 'play_count') final  int? playCount;
+@override@JsonKey(name: 'createdAt') final  DateTime createdAt;
+@override@JsonKey(name: 'playCount') final  int? playCount;
  final  List<QuestionDto> _questions;
 @override List<QuestionDto> get questions {
   if (_questions is EqualUnmodifiableListView) return _questions;
@@ -1078,16 +1045,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _QuizDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.kahootImageUrl, kahootImageUrl) || other.kahootImageUrl == kahootImageUrl)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&const DeepCollectionEquality().equals(other._themes, _themes)&&(identical(other.author, author) || other.author == author)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.playCount, playCount) || other.playCount == playCount)&&const DeepCollectionEquality().equals(other._questions, _questions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _QuizDto&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.coverImageId, coverImageId) || other.coverImageId == coverImageId)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.themeId, themeId) || other.themeId == themeId)&&(identical(other.author, author) || other.author == author)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.playCount, playCount) || other.playCount == playCount)&&const DeepCollectionEquality().equals(other._questions, _questions));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,kahootImageUrl,visibility,const DeepCollectionEquality().hash(_themes),author,createdAt,playCount,const DeepCollectionEquality().hash(_questions));
+int get hashCode => Object.hash(runtimeType,id,title,description,coverImageId,visibility,themeId,author,createdAt,playCount,const DeepCollectionEquality().hash(_questions));
 
 @override
 String toString() {
-  return 'QuizDto(id: $id, name: $name, description: $description, kahootImageUrl: $kahootImageUrl, visibility: $visibility, themes: $themes, author: $author, createdAt: $createdAt, playCount: $playCount, questions: $questions)';
+  return 'QuizDto(id: $id, title: $title, description: $description, coverImageId: $coverImageId, visibility: $visibility, themeId: $themeId, author: $author, createdAt: $createdAt, playCount: $playCount, questions: $questions)';
 }
 
 
@@ -1098,7 +1065,7 @@ abstract mixin class _$QuizDtoCopyWith<$Res> implements $QuizDtoCopyWith<$Res> {
   factory _$QuizDtoCopyWith(_QuizDto value, $Res Function(_QuizDto) _then) = __$QuizDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String? description,@JsonKey(name: 'kahoot_image_url') String? kahootImageUrl, String visibility, List<String>? themes, AuthorDto author,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'play_count') int? playCount, List<QuestionDto> questions
+ String id,@JsonKey(name: 'title') String title, String? description,@JsonKey(name: 'coverImageId') String? coverImageId, String visibility,@JsonKey(name: 'themeId') String? themeId, AuthorDto author,@JsonKey(name: 'createdAt') DateTime createdAt,@JsonKey(name: 'playCount') int? playCount, List<QuestionDto> questions
 });
 
 
@@ -1115,15 +1082,15 @@ class __$QuizDtoCopyWithImpl<$Res>
 
 /// Create a copy of QuizDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? kahootImageUrl = freezed,Object? visibility = null,Object? themes = freezed,Object? author = null,Object? createdAt = null,Object? playCount = freezed,Object? questions = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? description = freezed,Object? coverImageId = freezed,Object? visibility = null,Object? themeId = freezed,Object? author = null,Object? createdAt = null,Object? playCount = freezed,Object? questions = null,}) {
   return _then(_QuizDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,kahootImageUrl: freezed == kahootImageUrl ? _self.kahootImageUrl : kahootImageUrl // ignore: cast_nullable_to_non_nullable
+as String?,coverImageId: freezed == coverImageId ? _self.coverImageId : coverImageId // ignore: cast_nullable_to_non_nullable
 as String?,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
-as String,themes: freezed == themes ? _self._themes : themes // ignore: cast_nullable_to_non_nullable
-as List<String>?,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as String,themeId: freezed == themeId ? _self.themeId : themeId // ignore: cast_nullable_to_non_nullable
+as String?,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as AuthorDto,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,playCount: freezed == playCount ? _self.playCount : playCount // ignore: cast_nullable_to_non_nullable
 as int?,questions: null == questions ? _self._questions : questions // ignore: cast_nullable_to_non_nullable

@@ -67,7 +67,8 @@ class QuizRepositoryImpl implements QuizRepository {
     final quizDto = QuizDto.fromDomain(quiz);
 
     try {
-      final response = await _client.patch(
+      // Use PUT to replace the resource as per API contract
+      final response = await _client.put(
         Uri.parse('$baseUrl/kahoots/$quizId'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(quizDto.toJson()),

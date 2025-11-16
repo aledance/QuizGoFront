@@ -46,10 +46,12 @@ class QuizFormViewModel extends ChangeNotifier {
   }
 
   String _mapFailureToMessage(QuizFailure f) {
-    return f.maybeWhen(
-      notFound: () => 'Recurso no encontrado',
-      serverError: () => 'Error del servidor. Intenta más tarde',
-      orElse: () => 'Ocurrió un error',
-    );
+    if (f.isNotFound) {
+      return 'Recurso no encontrado';
+    }
+    if (f.isServerError) {
+      return 'Error del servidor. Intenta más tarde';
+    }
+    return 'Ocurrió un error';
   }
 }

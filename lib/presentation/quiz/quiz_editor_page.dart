@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart' hide Visibility;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_application_1/application/quiz/use_cases/create_quiz.dart';
+import 'package:flutter_application_1/application/quiz/use_cases/update_quiz.dart';
+import 'package:flutter_application_1/domain/quiz/entities/quiz.dart' as quiz_d;
+import 'package:flutter_application_1/domain/quiz/value_objects/image_url.dart';
 import 'package:flutter_application_1/infrastructure/injection.dart';
 import 'package:flutter_application_1/domain/quiz/value_objects/visibility.dart';
 import 'package:flutter_application_1/domain/quiz/entities/question.dart' as d;
@@ -10,10 +13,15 @@ import 'package:flutter_application_1/domain/quiz/entities/option.dart' as dopt;
 import 'package:flutter_application_1/domain/quiz/value_objects/unique_id.dart';
 import 'package:flutter_application_1/domain/quiz/value_objects/question_statement.dart';
 import 'package:flutter_application_1/domain/quiz/value_objects/option_text.dart';
+import 'package:flutter_application_1/domain/quiz/value_objects/quiz_name.dart';
+import 'package:flutter_application_1/domain/quiz/value_objects/quiz_description.dart';
 import 'package:flutter_application_1/domain/quiz/entities/author.dart';
 
 class QuizEditorPage extends StatefulWidget {
-  const QuizEditorPage({Key? key}) : super(key: key);
+  /// If [quiz] is provided, the page will work in edit mode and update the
+  /// existing quiz. Otherwise it will create a new quiz.
+  final dynamic quiz;
+  const QuizEditorPage({Key? key, this.quiz}) : super(key: key);
 
   @override
   State<QuizEditorPage> createState() => _QuizEditorPageState();
@@ -32,6 +40,33 @@ class _QuizEditorPageState extends State<QuizEditorPage> {
     _titleCtrl.dispose();
     _descCtrl.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // If editing an existing quiz, populate fields from the provided domain quiz.
+    final q = widget.quiz;
+    if (q != null) {
+      _titleCtrl.text = q.name.value;
+      _descCtrl.text = q.description.value;
+      if (q.kahootImage != null) {
+        _quizImagePath = q.kahootImage!.value;
+      }
+      // populate questions
+      _questions.clear();
+      for (final domQ in q.questions) {
+        final draft = _QuestionDraft();
+        draft.id = domQ.id.value;
+        draft.statement = domQ.statement.value;
+        draft.imagePath = null;
+        // options
+        draft.options = List.generate(domQ.options.length, (i) => domQ.options[i].text.value);
+        draft.optionIds = List.generate(domQ.options.length, (i) => domQ.options[i].id.value);
+        draft.correctIndex = domQ.options.indexWhere((o) => o.id.value == domQ.correctOption.id.value);
+        _questions.add(draft);
+      }
+    }
   }
 
   void _addQuestion() {
@@ -58,17 +93,51 @@ class _QuizEditorPageState extends State<QuizEditorPage> {
       return;
     }
 
-    // build domain questions
+    // build domain questions (preserve ids when available)
     final domainQuestions = _questions.map((q) {
-      final opts = List.generate(q.options.length, (i) => dopt.Option(id: UniqueId(), text: OptionText(q.options[i])));
+      final opts = List.generate(q.options.length, (i) {
+        final optId = (q.optionIds.isNotEmpty && q.optionIds.length > i && q.optionIds[i].isNotEmpty)
+            ? UniqueId.fromUniqueString(q.optionIds[i])
+            : UniqueId();
+        return dopt.Option(id: optId, text: OptionText(q.options[i]));
+      });
+
       final correct = opts[q.correctIndex.clamp(0, opts.length - 1)];
-      return d.Question(id: UniqueId(), statement: QuestionStatement(q.statement), options: opts, correctOption: correct);
+      final questionId = q.id.isNotEmpty ? UniqueId.fromUniqueString(q.id) : UniqueId();
+      return d.Question(id: questionId, statement: QuestionStatement(q.statement), options: opts, correctOption: correct);
     }).toList();
 
     final repo = createQuizRepository();
-    final create = CreateQuiz(repo);
     final author = Author(id: UniqueId(), name: 'Autor demo');
 
+    if (widget.quiz != null) {
+      // Update existing quiz
+      final existing = widget.quiz as quiz_d.Quiz;
+      final updatedQuiz = quiz_d.Quiz(
+        id: existing.id,
+  name: QuizName(_titleCtrl.text.trim()),
+  description: QuizDescription(_descCtrl.text.trim()),
+        kahootImage: _quizImagePath == null ? existing.kahootImage : ImageUrl(_quizImagePath!),
+        visibility: existing.visibility,
+        themes: existing.themes,
+        author: existing.author,
+        createdAt: existing.createdAt,
+        playCount: existing.playCount,
+        questions: domainQuestions,
+      );
+
+      final updater = UpdateQuiz(repo);
+      final res = await updater.call(updatedQuiz);
+
+      res.match(
+        (l) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error actualizando quiz'))),
+        (r) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Quiz actualizado'))),
+      );
+      return;
+    }
+
+    // Create new quiz
+    final create = CreateQuiz(repo);
     final res = await create.call(name: _titleCtrl.text.trim(), description: _descCtrl.text.trim(), visibility: Visibility.public, author: author, questions: domainQuestions);
 
     res.match(
@@ -182,8 +251,10 @@ class _QuizEditorPageState extends State<QuizEditorPage> {
 }
 
 class _QuestionDraft {
+  String id = ''; // preserve question id when editing
   String statement = '';
   List<String> options = ['', '', '', ''];
+  List<String> optionIds = ['', '', '', '']; // preserve option ids when editing
   int correctIndex = 0;
   String? imagePath;
 }
