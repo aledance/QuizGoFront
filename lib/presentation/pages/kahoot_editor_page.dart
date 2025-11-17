@@ -124,7 +124,34 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Pregunta ${_controller.selectedQuestionIndex + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Pregunta ${_controller.selectedQuestionIndex + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                IconButton(
+                                  tooltip: 'Eliminar pregunta',
+                                  onPressed: () async {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text('Eliminar pregunta'),
+                                        content: const Text('¿Estás seguro que quieres eliminar esta pregunta?'),
+                                        actions: [
+                                          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
+                                          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Eliminar')),
+                                        ],
+                                      ),
+                                    );
+                                    if (confirm == true) {
+                                      _controller.removeQuestion(_controller.selectedQuestionIndex);
+                                      // If all questions removed, add an empty one to keep editor usable
+                                      if (_controller.questions.isEmpty) _controller.addQuestion();
+                                    }
+                                  },
+                                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                ),
+                              ],
+                            ),
                             const SizedBox(height: 8),
                             TextField(
                               decoration: const InputDecoration(labelText: 'Enunciado'),
