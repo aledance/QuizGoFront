@@ -11,6 +11,7 @@ class ApplicationSimulation extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Application Simulation',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

@@ -15,6 +15,10 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   late KahootService _service;
   late KahootEditorController _controller;
   late VoidCallback _listener;
+  late TextEditingController _titleController;
+  late TextEditingController _descController;
+  late TextEditingController _questionController;
+  List<TextEditingController> _answerControllers = [];
 
   @override
   void initState() {
@@ -23,12 +27,55 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
     _controller = KahootEditorController(service: _service, initial: EditorKahoot());
     _listener = () => setState(() {});
     _controller.addListener(_listener);
+    _titleController = TextEditingController(text: _controller.editor.title);
+    _descController = TextEditingController(text: _controller.editor.description);
+    _titleController.addListener(() => _controller.setTitle(_titleController.text));
+    _descController.addListener(() => _controller.setDescription(_descController.text));
+    _setupQuestionControllers();
   }
 
   @override
   void dispose() {
     _controller.removeListener(_listener);
+    _titleController.dispose();
+    _descController.dispose();
+    _questionController.dispose();
+    for (final c in _answerControllers) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  void _setupQuestionControllers() {
+    // Ensure there is at least one question to avoid out-of-range access
+    if (_controller.questions.isEmpty) {
+      _controller.addQuestion();
+    }
+    // Clamp selected index
+    if (_controller.selectedQuestionIndex >= _controller.questions.length) {
+      _controller.selectedQuestionIndex = _controller.questions.length - 1;
+    }
+
+    // Dispose previous controllers if any
+    try {
+      _questionController.dispose();
+    } catch (_) {}
+    for (final c in _answerControllers) {
+      c.dispose();
+    }
+
+    final selected = _controller.selectedQuestion;
+    _questionController = TextEditingController(text: selected.text);
+    _answerControllers = selected.answers.map((a) => TextEditingController(text: a.text)).toList();
+    // update model when controllers change
+    _questionController.addListener(() => _controller.setQuestionText(_questionController.text));
+    for (var i = 0; i < _answerControllers.length; i++) {
+      final idx = i;
+      _answerControllers[i].addListener(() {
+        final val = _answerControllers[idx].text;
+        if (idx < _controller.selectedQuestion.answers.length) _controller.selectedQuestion.answers[idx].text = val;
+      });
+    }
   }
 
   @override
@@ -70,14 +117,12 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                             children: [
                               TextField(
                                 decoration: const InputDecoration(labelText: 'Título del Quiz'),
-                                onChanged: _controller.setTitle,
-                                controller: TextEditingController(text: _controller.editor.title),
+                                controller: _titleController,
                               ),
                               const SizedBox(height: 6),
                               TextField(
                                 decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
-                                onChanged: _controller.setDescription,
-                                controller: TextEditingController(text: _controller.editor.description),
+                                controller: _descController,
                               ),
                             ],
                           ),
@@ -91,7 +136,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Preguntas', style: TextStyle(fontWeight: FontWeight.bold)),
-                        TextButton.icon(onPressed: () => _controller.addQuestion(), icon: const Icon(Icons.add), label: const Text('Añadir')),
+                        TextButton.icon(onPressed: () { _controller.addQuestion(); _setupQuestionControllers(); }, icon: const Icon(Icons.add), label: const Text('Añadir')),
                       ],
                     ),
 
@@ -107,7 +152,10 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                             child: ChoiceChip(
                               label: Text('Pregunta ${index + 1}'),
                               selected: selected,
-                              onSelected: (_) => _controller.selectQuestion(index),
+                              onSelected: (_) {
+                                _controller.selectQuestion(index);
+                                _setupQuestionControllers();
+                              },
                             ),
                           );
                         },
@@ -146,6 +194,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                       _controller.removeQuestion(_controller.selectedQuestionIndex);
                                       // If all questions removed, add an empty one to keep editor usable
                                       if (_controller.questions.isEmpty) _controller.addQuestion();
+                                      _setupQuestionControllers();
                                     }
                                   },
                                   icon: const Icon(Icons.delete_outline, color: Colors.red),
@@ -155,8 +204,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                             const SizedBox(height: 8),
                             TextField(
                               decoration: const InputDecoration(labelText: 'Enunciado'),
-                              onChanged: _controller.setQuestionText,
-                              controller: TextEditingController(text: _controller.selectedQuestion.text),
+                              controller: _questionController,
                             ),
                             const SizedBox(height: 12),
                             Column(
@@ -172,13 +220,15 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                       Expanded(
                                         child: TextField(
                                           decoration: InputDecoration(hintText: 'Añadir respuesta ${i + 1}${i >= 2 ? ' (opcional)' : ''}'),
-                                          onChanged: (v) => a.text = v,
-                                          controller: TextEditingController(text: a.text),
+                                          controller: i < _answerControllers.length ? _answerControllers[i] : null,
                                         ),
                                       ),
                                       const SizedBox(width: 8),
                                       GestureDetector(
-                                        onTap: () => _controller.setSingleCorrect(i),
+                                        onTap: () {
+                                          _controller.setSingleCorrect(i);
+                                          setState(() {});
+                                        },
                                         child: Icon(a.isCorrect ? Icons.radio_button_checked : Icons.radio_button_off, color: a.isCorrect ? Theme.of(context).primaryColor : Colors.grey),
                                       ),
                                     ],
@@ -190,7 +240,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                TextButton.icon(onPressed: () => _controller.addAnswerToSelected(), icon: const Icon(Icons.add_circle_outline), label: const Text('Añadir respuesta')),
+                                TextButton.icon(onPressed: () { _controller.addAnswerToSelected(); _setupQuestionControllers(); }, icon: const Icon(Icons.add_circle_outline), label: const Text('Añadir respuesta')),
                                 ElevatedButton(onPressed: () async {
                                   final errors = _controller.validate();
                                   if (errors.isNotEmpty) {
@@ -228,7 +278,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: ElevatedButton.icon(onPressed: () => _controller.addQuestion(), icon: const Icon(Icons.add), label: const Text('Añadir pregunta')),
+                      child: ElevatedButton.icon(onPressed: () { _controller.addQuestion(); _setupQuestionControllers(); }, icon: const Icon(Icons.add), label: const Text('Añadir pregunta')),
                     ),
                     Expanded(
                       child: ListView.builder(
@@ -237,8 +287,8 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                           return ListTile(
                             selected: index == _controller.selectedQuestionIndex,
                             title: Text('Pregunta ${index + 1}'),
-                            trailing: IconButton(icon: const Icon(Icons.delete_outline), onPressed: () => _controller.removeQuestion(index)),
-                            onTap: () => _controller.selectQuestion(index),
+                            trailing: IconButton(icon: const Icon(Icons.delete_outline), onPressed: () { _controller.removeQuestion(index); _setupQuestionControllers(); }),
+                            onTap: () { _controller.selectQuestion(index); _setupQuestionControllers(); },
                           );
                         },
                       ),
@@ -261,9 +311,9 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                         const SizedBox(width: 20),
                         Expanded(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            TextField(decoration: const InputDecoration(labelText: 'Título del Quiz'), onChanged: _controller.setTitle, controller: TextEditingController(text: _controller.editor.title)),
+                            TextField(decoration: const InputDecoration(labelText: 'Título del Quiz'), controller: _titleController),
                             const SizedBox(height: 8),
-                            TextField(decoration: const InputDecoration(labelText: 'Descripción (opcional)'), onChanged: _controller.setDescription, controller: TextEditingController(text: _controller.editor.description)),
+                            TextField(decoration: const InputDecoration(labelText: 'Descripción (opcional)'), controller: _descController),
                           ]),
                         ),
                         const SizedBox(width: 20),
@@ -281,7 +331,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text('Pregunta ${_controller.selectedQuestionIndex + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
-                            TextField(decoration: const InputDecoration(labelText: 'Enunciado'), onChanged: _controller.setQuestionText, controller: TextEditingController(text: _controller.selectedQuestion.text)),
+                            TextField(decoration: const InputDecoration(labelText: 'Enunciado'), controller: _questionController),
                             const SizedBox(height: 12),
 
                             // Answers grid
@@ -293,17 +343,17 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                 child: Row(children: [
                                   Container(width: 40, height: 40, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(6))),
                                   const SizedBox(width: 12),
-                                  Expanded(child: TextField(decoration: InputDecoration(hintText: 'Añadir respuesta ${i + 1}${i >= 2 ? ' (opcional)' : ''}'), onChanged: (v) => a.text = v, controller: TextEditingController(text: a.text))),
+                                  Expanded(child: TextField(decoration: InputDecoration(hintText: 'Añadir respuesta ${i + 1}${i >= 2 ? ' (opcional)' : ''}'), controller: i < _answerControllers.length ? _answerControllers[i] : null)),
                                   const SizedBox(width: 12),
                                   // Radio for single correct
-                                  GestureDetector(onTap: () => _controller.setSingleCorrect(i), child: Icon(a.isCorrect ? Icons.radio_button_checked : Icons.radio_button_off, color: a.isCorrect ? Theme.of(context).primaryColor : Colors.grey)),
+                                  GestureDetector(onTap: () { _controller.setSingleCorrect(i); setState(() {}); }, child: Icon(a.isCorrect ? Icons.radio_button_checked : Icons.radio_button_off, color: a.isCorrect ? Theme.of(context).primaryColor : Colors.grey)),
                                 ]),
                               );
                             })),
 
                             const SizedBox(height: 8),
                             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                              TextButton.icon(onPressed: () => _controller.addAnswerToSelected(), icon: const Icon(Icons.add_circle_outline), label: const Text('Añadir respuesta')),
+                              TextButton.icon(onPressed: () { _controller.addAnswerToSelected(); _setupQuestionControllers(); }, icon: const Icon(Icons.add_circle_outline), label: const Text('Añadir respuesta')),
                               ElevatedButton(onPressed: () async {
                                 final errors = _controller.validate();
                                 if (errors.isNotEmpty) {

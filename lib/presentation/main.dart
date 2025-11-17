@@ -10,29 +10,37 @@ class PresentationApp extends StatelessWidget {
 
 	@override
 	Widget build(BuildContext context) {
-			final seed = Colors.deepPurple;
+		final seed = Colors.purple;
+		final colorScheme = ColorScheme.fromSeed(seedColor: seed);
+
 			return MaterialApp(
 				title: 'Quiz Editor',
-				theme: ThemeData(
-					useMaterial3: false,
-					colorScheme: ColorScheme.fromSeed(seedColor: seed),
-					primarySwatch: Colors.deepPurple,
-					primaryColor: Colors.deepPurple[700],
-					appBarTheme: AppBarTheme(
-						backgroundColor: Colors.deepPurple[600],
-						foregroundColor: Colors.white,
-						elevation: 2,
-					),
-					elevatedButtonTheme: ElevatedButtonThemeData(
-						style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple[600]),
-					),
-					textButtonTheme: TextButtonThemeData(
-						style: TextButton.styleFrom(foregroundColor: Colors.deepPurple[600]),
-					),
-					floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: Colors.deepPurple[600]),
-			// cardTheme omitted to avoid SDK type mismatch; individual Cards keep local styling
+				debugShowCheckedModeBanner: false,
+			theme: ThemeData(
+				colorScheme: colorScheme,
+				useMaterial3: true,
+				primaryColor: colorScheme.primary,
+				scaffoldBackgroundColor: colorScheme.background,
+				appBarTheme: AppBarTheme(
+					backgroundColor: colorScheme.primary,
+					foregroundColor: colorScheme.onPrimary,
+					elevation: 2,
 				),
-				home: const KahootEditorPage(),
-			);
+				elevatedButtonTheme: ElevatedButtonThemeData(
+					style: ElevatedButton.styleFrom(
+						backgroundColor: colorScheme.primary,
+						foregroundColor: colorScheme.onPrimary,
+						shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+					),
+				),
+				inputDecorationTheme: InputDecorationTheme(
+					filled: true,
+					fillColor: colorScheme.surface.withOpacity(0.04),
+					border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+				),
+
+			),
+					home: const KahootEditorPage(),
+		);
 	}
 }
