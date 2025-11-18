@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../infrastructure/challenge_api.dart';
-import '../domain/challenge_models.dart';
+import '../application/services/challenge_service.dart';
+import '../domain/entidades/challenge_models.dart';
 
 void main() {
   runApp(const ApplicationSimulation());
@@ -36,11 +37,12 @@ class SimulationHomePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Example usage of the ChallengeApi client. Replace baseUrl with your API host.
+          // Example usage of the ChallengeService (wraps the API client).
           final api = ChallengeApi(baseUrl: 'https://api.example.com');
+          final service = ChallengeService(api);
           try {
             final req = CreateChallengeRequest(kahootId: '00000000-0000-0000-0000-000000000000');
-            final res = await api.createChallenge(req);
+            final res = await service.createChallenge(req);
             if (context.mounted) {
               showDialog(
                 context: context,

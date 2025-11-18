@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../domain/challenge_models.dart';
-import '../domain/player_models.dart';
-import '../domain/response_models.dart';
-import '../domain/ranking_models.dart';
+import '../domain/entidades/challenge_models.dart';
+import '../domain/entidades/player_models.dart';
+import '../domain/entidades/response_models.dart';
+import '../domain/entidades/ranking_models.dart';
 
 /// A lightweight client for the Challenge-related API endpoints described in
 /// the spec. All requests / responses use camelCase JSON.
