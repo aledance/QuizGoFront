@@ -88,7 +88,7 @@ class UsersController extends ChangeNotifier {
     users[idx].active = !old;
     notifyListeners();
     try {
-      // Use PATCH to change only active/status instead of full PUT
+  // Use PATCH to change only the canonical 'active' flag instead of full PUT
       await _service.patchUser(id, {'active': users[idx].active});
     } catch (e) {
       // revert

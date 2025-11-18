@@ -29,6 +29,8 @@ void main(List<String> args) async {
     }
     // ensure active is boolean
     if (!user.containsKey('active')) user['active'] = true;
+    // remove legacy status field if present; 'active' is canonical
+    if (user.containsKey('status')) user.remove('status');
     return user;
   }
 
@@ -139,6 +141,22 @@ void main(List<String> args) async {
           if (req.method == 'POST' && pathSegments.length == usersIndex + 1) {
             final body = await utf8.decoder.bind(req).join();
             final data = (body.isNotEmpty) ? json.decode(body) as Map<String, dynamic> : <String, dynamic>{};
+            // Validate incoming user payload: role (if provided) must be one of allowed, active (if provided) must be boolean
+            final allowedRoles = ['admin', 'educator', 'moderator', 'player'];
+            if (data.containsKey('role') && data['role'] != null && !allowedRoles.contains(data['role'].toString())) {
+              req.response.statusCode = HttpStatus.badRequest;
+              req.response.headers.contentType = ContentType.json;
+              req.response.write(json.encode({'error': 'Invalid role'}));
+              await req.response.close();
+              return;
+            }
+            if (data.containsKey('active') && data['active'] is! bool) {
+              req.response.statusCode = HttpStatus.badRequest;
+              req.response.headers.contentType = ContentType.json;
+              req.response.write(json.encode({'error': 'Invalid field: active must be boolean'}));
+              await req.response.close();
+              return;
+            }
             final id = DateTime.now().millisecondsSinceEpoch.toString();
             data['id'] = id;
             data['createdAt'] = DateTime.now().toIso8601String();
@@ -150,9 +168,8 @@ void main(List<String> args) async {
             }
             data['active'] = data['active'] ?? true;
             // Normalize single role and default to 'player' when none valid
-            final allowed = ['admin', 'educator', 'moderator', 'player'];
             final incomingRole = data['role']?.toString();
-            final normalized = (incomingRole != null && allowed.contains(incomingRole)) ? incomingRole : 'player';
+            final normalized = (incomingRole != null && allowedRoles.contains(incomingRole)) ? incomingRole : 'player';
             data['role'] = normalized;
             storageUsers[id] = normalizeUser(data);
             req.response.statusCode = HttpStatus.created;
@@ -163,7 +180,7 @@ void main(List<String> args) async {
           }
 
           // GET /admin/users or /users -> list (supports query: q/search, role, page, limit, orderBy, order)
-          if (req.method == 'GET' && pathSegments.length == usersIndex + 1) {
+            if (req.method == 'GET' && pathSegments.length == usersIndex + 1) {
             final params = req.uri.queryParameters;
             // accept both 'q' and 'search' for compatibility with spec and UI
             final searchQ = (params['q'] ?? params['search'] ?? '').trim().toLowerCase();
@@ -248,7 +265,7 @@ void main(List<String> args) async {
           }
 
           // routes with id /admin/users/:id  OR /users/:id
-          if (pathSegments.length == usersIndex + 2) {
+            if (pathSegments.length == usersIndex + 2) {
             final id = pathSegments[usersIndex + 1];
             // GET /admin/users/:id
             if (req.method == 'GET') {
@@ -297,26 +314,46 @@ void main(List<String> args) async {
               }
               final body = await utf8.decoder.bind(req).join();
               final data = (body.isNotEmpty) ? json.decode(body) as Map<String, dynamic> : <String, dynamic>{};
-              // support multiple shapes: {"status":"blocked"} or {"blocked":true} or {"active":false}
-              if (data.containsKey('status')) {
-                existing['status'] = data['status'];
-                // normalize active boolean if status indicates blocked
-                existing['active'] = data['status'] == 'blocked' ? false : existing['active'];
+              // Validate incoming moderation shape and apply to canonical 'active' field only.
+              // Accept shapes: {"active": bool} or {"blocked": bool} or {"status": "blocked"|"active"}
+              if (data.containsKey('active') && data['active'] is! bool) {
+                req.response.statusCode = HttpStatus.badRequest;
+                req.response.headers.contentType = ContentType.json;
+                req.response.write(json.encode({'error': 'Invalid field: active must be boolean'}));
+                await req.response.close();
+                return;
+              }
+              if (data.containsKey('blocked') && data['blocked'] is! bool) {
+                req.response.statusCode = HttpStatus.badRequest;
+                req.response.headers.contentType = ContentType.json;
+                req.response.write(json.encode({'error': 'Invalid field: blocked must be boolean'}));
+                await req.response.close();
+                return;
+              }
+              if (data.containsKey('status') && data['status'] != null) {
+                final s = data['status'].toString();
+                if (s != 'blocked' && s != 'active') {
+                  req.response.statusCode = HttpStatus.badRequest;
+                  req.response.headers.contentType = ContentType.json;
+                  req.response.write(json.encode({'error': 'Invalid status value'}));
+                  await req.response.close();
+                  return;
+                }
+                existing['active'] = s == 'active';
               }
               if (data.containsKey('blocked')) {
                 final blocked = data['blocked'] == true;
                 existing['active'] = !blocked;
-                existing['status'] = blocked ? 'blocked' : (existing['status'] ?? 'active');
               }
               if (data.containsKey('active')) {
                 existing['active'] = data['active'];
-                existing['status'] = data['active'] == true ? (existing['status'] == 'blocked' ? 'active' : existing['status']) : 'blocked';
               }
-              // merge other provided fields shallowly
+              // merge other provided fields shallowly (ignore any legacy 'status')
               data.forEach((k, v) {
                 if (k != 'status' && k != 'blocked' && k != 'active') existing[k] = v;
               });
-              // normalize and store
+              // normalize and store; ensure 'status' is not persisted
+              existing.remove('status');
               storageUsers[id] = normalizeUser(existing);
               req.response.statusCode = HttpStatus.ok;
               req.response.headers.contentType = ContentType.json;
@@ -337,6 +374,22 @@ void main(List<String> args) async {
               }
               final body = await utf8.decoder.bind(req).join();
               final data = (body.isNotEmpty) ? json.decode(body) as Map<String, dynamic> : <String, dynamic>{};
+              // Validate incoming payload for PUT: role (if provided) must be allowed, active (if provided) must be boolean
+              final allowed = ['admin', 'educator', 'moderator', 'player'];
+              if (data.containsKey('role') && data['role'] != null && !allowed.contains(data['role'].toString())) {
+                req.response.statusCode = HttpStatus.badRequest;
+                req.response.headers.contentType = ContentType.json;
+                req.response.write(json.encode({'error': 'Invalid role'}));
+                await req.response.close();
+                return;
+              }
+              if (data.containsKey('active') && data['active'] is! bool) {
+                req.response.statusCode = HttpStatus.badRequest;
+                req.response.headers.contentType = ContentType.json;
+                req.response.write(json.encode({'error': 'Invalid field: active must be boolean'}));
+                await req.response.close();
+                return;
+              }
               data['id'] = id;
               data['createdAt'] = existing['createdAt'] ?? DateTime.now().toIso8601String();
               // Accept legacy 'roles' array when updating
@@ -346,10 +399,10 @@ void main(List<String> args) async {
                 data.remove('roles');
               }
               // normalize role: if provided and valid, use it; if not provided, keep existing; if invalid, default to 'player'
-              final allowed = ['admin', 'educator', 'moderator', 'player'];
+              final allowedRoles2 = ['admin', 'educator', 'moderator', 'player'];
               if (data.containsKey('role')) {
                 final r = data['role']?.toString();
-                data['role'] = (r != null && allowed.contains(r)) ? r : 'player';
+                data['role'] = (r != null && allowedRoles2.contains(r)) ? r : 'player';
               } else {
                 data['role'] = existing['role'] ?? 'player';
               }
