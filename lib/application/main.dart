@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../infrastructure/challenge_api.dart';
+import '../domain/challenge_models.dart';
+
 void main() {
   runApp(const ApplicationSimulation());
 }
@@ -30,6 +33,34 @@ class SimulationHomePage extends StatelessWidget {
       ),
       body: const Center(
         child: Text('This is a simulation for the application layer.'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Example usage of the ChallengeApi client. Replace baseUrl with your API host.
+          final api = ChallengeApi(baseUrl: 'https://api.example.com');
+          try {
+            final req = CreateChallengeRequest(kahootId: '00000000-0000-0000-0000-000000000000');
+            final res = await api.createChallenge(req);
+            if (context.mounted) {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text('Challenge created'),
+                  content: Text('PIN: ${res.challengePin}\nShare: ${res.shareLink}'),
+                  actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+                ),
+              );
+            }
+          } catch (e) {
+            if (context.mounted) {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(title: const Text('Error'), content: Text(e.toString()), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))]),
+              );
+            }
+          }
+        },
+        child: const Icon(Icons.api),
       ),
     );
   }
