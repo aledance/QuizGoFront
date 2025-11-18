@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/entidades/challenge_models.dart';
 import '../widgets/progress_bar.dart';
 
 class ChallengeDetailScreen extends StatefulWidget {

@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import '../../lib/infrastructure/challenge_api.dart';
-import '../../lib/domain/entidades/challenge_models.dart';
-import '../../lib/domain/entidades/player_models.dart';
-import '../../lib/domain/entidades/response_models.dart';
-import '../../lib/domain/entidades/ranking_models.dart';
+import 'package:flutter_application_1/infrastructure/challenge_api.dart';
+import 'package:flutter_application_1/domain/entidades/challenge_models.dart';
+import 'package:flutter_application_1/domain/entidades/player_models.dart';
+import 'package:flutter_application_1/domain/entidades/response_models.dart';
+import 'package:flutter_application_1/domain/entidades/ranking_models.dart';
 
 /// A very small fake ChallengeApi for unit tests. Implements the same public
 /// surface as the real client used by `ChallengeService`.

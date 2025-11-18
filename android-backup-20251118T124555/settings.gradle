@@ -41,8 +41,20 @@ dependencyResolutionManagement {
             return properties.getProperty("flutter.sdk")
         }()
         if (flutterSdkPath != null) {
-            maven {
-                url = uri("${flutterSdkPath}/bin/cache/artifacts/engine/android")
+            // Some Flutter SDKs store engine artifacts in subfolders like
+            // android-arm64-release, android-x64, etc. Register all
+            // directories that start with 'android' so Gradle can resolve
+            // io.flutter engine artifacts regardless of layout.
+            def engineDir = file("${flutterSdkPath}/bin/cache/artifacts/engine")
+            if (engineDir.exists()) {
+                engineDir.eachDir { d ->
+                    if (d.name.startsWith('android')) {
+                        maven { url = uri(d) }
+                    }
+                }
+            } else {
+                // fallback to public repo
+                maven { url 'https://storage.googleapis.com/download.flutter.io' }
             }
         }
         // Public Flutter artifacts repository (fallback):
