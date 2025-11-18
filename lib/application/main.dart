@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../infrastructure/challenge_api.dart';
 import '../application/services/challenge_service.dart';
 import '../domain/entidades/challenge_models.dart';
+import '../presentation/screens/challenge_list_screen.dart';
+import '../presentation/screens/personal_results_screen.dart';
+import '../presentation/screens/ranking_screen.dart';
 
 void main() {
   runApp(const ApplicationSimulation());
@@ -18,7 +21,11 @@ class ApplicationSimulation extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SimulationHomePage(),
+      home: const ChallengeListScreen(),
+      routes: {
+        '/results': (_) => const PersonalResultsScreen(),
+        '/ranking': (_) => const RankingScreen(),
+      },
     );
   }
 }
