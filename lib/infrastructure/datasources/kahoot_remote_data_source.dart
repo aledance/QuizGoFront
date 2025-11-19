@@ -37,10 +37,42 @@ class KahootRemoteDataSource {
     throw Exception('Failed to get kahoot: ${res.statusCode} ${res.body}');
   }
 
-  Future<void> deleteKahoot(String kahootId) async {
+  /// Delete kahoot. Accepts optional [authToken] to send Authorization header for admin actions.
+  Future<void> deleteKahoot(String kahootId, {String? authToken}) async {
     final uri = Uri.parse('$baseUrl/kahoots/$kahootId');
-    final res = await client.delete(uri);
-    if (res.statusCode == 200) return;
+    final headers = <String, String>{};
+    if (authToken != null && authToken.isNotEmpty) headers['Authorization'] = 'Bearer $authToken';
+    final res = await client.delete(uri, headers: headers);
+    // Accept 200 or 204 as success (mock server returns 204)
+    if (res.statusCode == 200 || res.statusCode == 204) return;
     throw Exception('Failed to delete kahoot: ${res.statusCode} ${res.body}');
+  }
+
+  /// List all kahoots (returns raw map list from server)
+  Future<List<Map<String, dynamic>>> listKahoots() async {
+    final uri = Uri.parse('$baseUrl/kahoots');
+    final res = await client.get(uri, headers: {'Accept': 'application/json'});
+    if (res.statusCode == 200) {
+      final parsed = jsonDecode(res.body) as List<dynamic>;
+      return parsed.cast<Map<String, dynamic>>();
+    }
+    throw Exception('Failed to list kahoots: ${res.statusCode} ${res.body}');
+  }
+
+  /// Admin PATCH for kahoot moderation. Sends optional Authorization token.
+  Future<Map<String, dynamic>> patchKahoot(String kahootId, Map<String, dynamic> data, {String? authToken}) async {
+    final uri = Uri.parse('$baseUrl/kahoots/$kahootId');
+    final headers = {'Content-Type': 'application/json'};
+    if (authToken != null && authToken.isNotEmpty) headers['Authorization'] = 'Bearer $authToken';
+    // Use HTTP PATCH via a generic request
+    final req = http.Request('PATCH', uri);
+    req.headers.addAll(headers);
+    req.body = jsonEncode(data);
+    final streamed = await client.send(req);
+    final res = await http.Response.fromStream(streamed);
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body) as Map<String, dynamic>;
+    }
+    throw Exception('Failed to patch kahoot: ${res.statusCode} ${res.body}');
   }
 }

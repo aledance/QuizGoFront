@@ -15,7 +15,7 @@ class User {
     this.active = true,
     Role? role,
     DateTime? createdAt,
-  })  : role = role ?? Role.player,
+  })  : role = role ?? Role.student,
         createdAt = createdAt ?? DateTime.now();
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -23,7 +23,7 @@ class User {
         name: json['name'] as String,
         email: json['email'] as String,
         active: json['active'] as bool? ?? true,
-        role: json['role'] != null ? RoleExt.fromString(json['role'] as String) : Role.player,
+        role: json['role'] != null ? RoleExt.fromString(json['role'] as String) : Role.student,
         createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt'] as String) : DateTime.now(),
       );
 
@@ -32,7 +32,7 @@ class User {
         'name': name,
         'email': email,
         'active': active,
-        'role': role.value,
+    'role': role.value,
         'createdAt': createdAt.toIso8601String(),
       };
 }

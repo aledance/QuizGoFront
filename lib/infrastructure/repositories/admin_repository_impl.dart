@@ -31,6 +31,18 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
+  Future<Map<String, dynamic>> getMetrics() async {
+    final json = await remote.getMetrics();
+    return json;
+  }
+
+  @override
+  Future<Map<String, dynamic>> seed() async {
+    final json = await remote.seed();
+    return json;
+  }
+
+  @override
   Future<User> updateUser(String id, User user) async {
     final json = await remote.updateUser(id, user.toJson());
     return User.fromJson(json);

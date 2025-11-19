@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/domain/entities/user.dart';
 import 'package:flutter_application_1/domain/entities/role.dart';
 import 'package:flutter_application_1/presentation/admin/widgets/admin_drawer.dart';
@@ -35,7 +36,7 @@ class _UsersPageState extends State<UsersPage> {
   void _showCreateDialog() {
     final nameC = TextEditingController();
     final emailC = TextEditingController();
-  // allow selecting a single role when creating; if none chosen default to player
+  // allow selecting a single role when creating; if none chosen default to student
   Role? selectedRole;
     showDialog<void>(
       context: context,
@@ -51,7 +52,7 @@ class _UsersPageState extends State<UsersPage> {
               mainAxisSize: MainAxisSize.min,
               children: Role.values.map((r) {
                 return RadioListTile<Role>(
-                  title: Text(r.value),
+                  title: Text(r.label),
                   value: r,
                   groupValue: selectedRole,
                   onChanged: (v) {
@@ -69,7 +70,7 @@ class _UsersPageState extends State<UsersPage> {
             onPressed: () async {
               if (nameC.text.trim().isEmpty || emailC.text.trim().isEmpty) return;
               final id = DateTime.now().millisecondsSinceEpoch.toString();
-              final roleToUse = selectedRole ?? Role.player;
+              final roleToUse = selectedRole ?? Role.student;
               final u = User(id: id, name: nameC.text, email: emailC.text, role: roleToUse);
               _controller.addUser(u);
               Navigator.of(ctx).pop();
@@ -103,7 +104,7 @@ class _UsersPageState extends State<UsersPage> {
               hint: const Text('Filtrar por rol'),
               items: [
                 const DropdownMenuItem<String>(value: '', child: Text('Todos')),
-                ...Role.values.map((r) => DropdownMenuItem<String>(value: r.value, child: Text(r.value))).toList(),
+                ...Role.values.map((r) => DropdownMenuItem<String>(value: r.value, child: Text(r.label))).toList(),
               ],
               onChanged: (v) {
                 final val = (v != null && v.isEmpty) ? null : v;
@@ -192,12 +193,23 @@ class _UsersPageState extends State<UsersPage> {
                               Text(u.email),
                               const SizedBox(height: 4),
                               Wrap(spacing: 6, children: [
-                                Chip(label: Text(u.role.value)),
+                                Chip(label: Text(u.role.label)),
                                 Chip(label: Text(u.active ? 'Activo' : 'Bloqueado'), backgroundColor: u.active ? Colors.green[50] : Colors.red[50])
                               ]),
+                              const SizedBox(height: 6),
+                              Text('ID: ${u.id}', style: TextStyle(fontSize: 12, color: Colors.grey[700])),
                             ],
                           ),
                           trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                            // copy id button for quick reference
+                            IconButton(
+                              icon: const Icon(Icons.copy, size: 20),
+                              tooltip: 'Copiar id',
+                              onPressed: () {
+                                Clipboard.setData(ClipboardData(text: u.id));
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Id copiado al portapapeles')));
+                              },
+                            ),
                             IconButton(icon: const Icon(Icons.edit), onPressed: () async {
                               final nameC = TextEditingController(text: u.name);
                               final emailC = TextEditingController(text: u.email);
@@ -217,7 +229,7 @@ class _UsersPageState extends State<UsersPage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: Role.values.map((r) {
                                           return RadioListTile<Role>(
-                                            title: Text(r.value),
+                                            title: Text(r.label),
                                             value: r,
                                             groupValue: selectedRole,
                                             onChanged: (v) {
@@ -233,7 +245,7 @@ class _UsersPageState extends State<UsersPage> {
                                     TextButton(onPressed: () => Navigator.of(ctx).pop(null), child: const Text('Cancelar')),
                                     ElevatedButton(onPressed: () {
                                       final id = u.id;
-                                      final newU = User(id: id, name: nameC.text, email: emailC.text, active: u.active, role: selectedRole ?? Role.player, createdAt: u.createdAt);
+                                      final newU = User(id: id, name: nameC.text, email: emailC.text, active: u.active, role: selectedRole ?? Role.student, createdAt: u.createdAt);
                                       Navigator.of(ctx).pop(newU);
                                     }, child: const Text('Guardar')),
                                   ],

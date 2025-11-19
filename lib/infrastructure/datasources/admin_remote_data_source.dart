@@ -32,6 +32,25 @@ class AdminRemoteDataSource {
     throw Exception('Failed to load users: ${res.statusCode}');
   }
 
+  Future<Map<String, dynamic>> getMetrics() async {
+    final uri = Uri.parse('$baseUrl/admin/metrics');
+    final res = await client.get(uri);
+    if (res.statusCode == 200) {
+      return json.decode(res.body) as Map<String, dynamic>;
+    }
+    throw Exception('Failed to load metrics: ${res.statusCode}');
+  }
+
+  /// Trigger server-side seeding of demo data. Returns a summary map like { kahoots: n, users: n, authors: n }
+  Future<Map<String, dynamic>> seed() async {
+    final uri = Uri.parse('$baseUrl/admin/_seed');
+    final res = await client.post(uri, headers: {'Content-Type': 'application/json'});
+    if (res.statusCode == 201 || res.statusCode == 200) {
+      return json.decode(res.body) as Map<String, dynamic>;
+    }
+    throw Exception('Failed to seed demo data: ${res.statusCode}');
+  }
+
   Future<Map<String, dynamic>> createUser(Map<String, dynamic> data) async {
     final uri = Uri.parse('$baseUrl/admin/users');
     final res = await client.post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode(data));

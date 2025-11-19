@@ -41,7 +41,9 @@ class KahootDto {
 
   /// Produce request JSON according to API spec (authorId + questionText/questionType + answers.answerText)
   Map<String, dynamic> toJsonRequest({required String authorId}) => {
-        'authorId': authorId,
+    'authorId': authorId,
+    // include author map so PUT/POST preserve author info on server-side storage
+    'author': {'authorId': authorId, 'name': author['name'] ?? ''},
         'title': title,
         'description': description,
         'coverImageId': coverImageId,

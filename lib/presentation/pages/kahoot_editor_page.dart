@@ -3,10 +3,14 @@ import 'package:flutter_application_1/presentation/admin/pages/admin_dashboard_p
 import '../controllers/kahoot_editor_controller.dart';
 import '../services/kahoot_service.dart';
 import '../../application/editor/kahoot_editor.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_application_1/infrastructure/datasources/theme_remote_data_source.dart';
 // domain question import not required here
 
 class KahootEditorPage extends StatefulWidget {
-  const KahootEditorPage({super.key});
+  final String? kahootId;
+
+  const KahootEditorPage({super.key, this.kahootId});
 
   @override
   State<KahootEditorPage> createState() => _KahootEditorPageState();
@@ -20,6 +24,8 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   late TextEditingController _descController;
   late TextEditingController _questionController;
   List<TextEditingController> _answerControllers = [];
+  late ThemeRemoteDataSource _themesSource;
+  late Future<List<Map<String, dynamic>>> _themesFuture;
 
   @override
   void initState() {
@@ -28,11 +34,28 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
     _controller = KahootEditorController(service: _service, initial: EditorKahoot());
     _listener = () => setState(() {});
     _controller.addListener(_listener);
+  _themesSource = ThemeRemoteDataSource(client: http.Client());
+  _themesFuture = _themesSource.listThemes();
     _titleController = TextEditingController(text: _controller.editor.title);
     _descController = TextEditingController(text: _controller.editor.description);
     _titleController.addListener(() => _controller.setTitle(_titleController.text));
     _descController.addListener(() => _controller.setDescription(_descController.text));
     _setupQuestionControllers();
+
+    // If a kahootId was provided, load it into the editor so the page works as
+    // both Create and Edit. After load, refresh controllers to show persisted data.
+    if (widget.kahootId != null && widget.kahootId!.isNotEmpty) {
+      _controller.loadKahoot(widget.kahootId!).then((_) {
+        if (!mounted) return;
+        // update text controllers with loaded data
+        _titleController.text = _controller.editor.title;
+        _descController.text = _controller.editor.description;
+        _setupQuestionControllers();
+        setState(() {});
+      }).catchError((e) {
+        // ignore here; controller will show errors where appropriate
+      });
+    }
   }
 
   @override
@@ -123,6 +146,44 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                                                // Show author (read-only) and theme selector so user can change theme
+                                                if (_controller.editor.author.authorId.isNotEmpty)
+                                                  Padding(padding: const EdgeInsets.only(bottom: 8.0), child: Chip(label: Text('Autor: ${_controller.editor.author.name}'))),
+                                                FutureBuilder<List<Map<String, dynamic>>>(
+                                                  future: _themesFuture,
+                                                  builder: (ctx, snap) {
+                                                    if (snap.connectionState == ConnectionState.waiting) {
+                                                      if (_controller.editor.themeId != null && _controller.editor.themeId!.isNotEmpty) {
+                                                        return Padding(padding: const EdgeInsets.only(bottom: 8.0), child: Chip(label: Text('Tema: ${_controller.editor.themeId}')));
+                                                      }
+                                                      return const SizedBox.shrink();
+                                                    }
+                                                    final themes = snap.data ?? [];
+                                                    return Padding(
+                                                      padding: const EdgeInsets.only(bottom: 8.0),
+                                                      child: Row(children: [
+                                                        const Text('Tema: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                        const SizedBox(width: 8),
+                                                        DropdownButton<String>(
+                                                          value: (_controller.editor.themeId == null || _controller.editor.themeId == '') ? null : _controller.editor.themeId,
+                                                          hint: const Text('Seleccionar tema'),
+                                                          items: [
+                                                            const DropdownMenuItem<String>(value: '', child: Text('Sin tema')),
+                                                            ...themes.map((t) {
+                                                              final v = (t['name'] ?? t['id'] ?? '').toString();
+                                                              final label = (t['name'] ?? t['id'] ?? '').toString();
+                                                              return DropdownMenuItem<String>(value: v, child: Text(label));
+                                                            }).toList(),
+                                                          ],
+                                                          onChanged: (v) {
+                                                            final val = (v != null && v.isEmpty) ? null : v;
+                                                            _controller.setThemeId(val);
+                                                          },
+                                                        ),
+                                                      ]),
+                                                    );
+                                                  },
+                                                ),
                               TextField(
                                 decoration: const InputDecoration(labelText: 'Título del Quiz'),
                                 controller: _titleController,
@@ -256,9 +317,15 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                     return;
                                   }
                                   try {
-                                    final created = await _controller.createKahoot();
-                                    showMessage('Kahoot creado');
-                                    await _controller.loadKahoot(created.id ?? '');
+                                    if (_controller.editor.id != null && _controller.editor.id!.isNotEmpty) {
+                                      final updated = await _controller.updateKahoot(_controller.editor.id!);
+                                      showMessage('Kahoot actualizado');
+                                      await _controller.loadKahoot(updated.id ?? '');
+                                    } else {
+                                      final created = await _controller.createKahoot();
+                                      showMessage('Kahoot creado');
+                                      await _controller.loadKahoot(created.id ?? '');
+                                    }
                                   } catch (e) {
                                     showMessage('Error: $e');
                                   }
@@ -369,9 +436,15 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                   return;
                                 }
                                 try {
-                                  final created = await _controller.createKahoot();
-                                  showMessage('Kahoot creado');
-                                  await _controller.loadKahoot(created.id ?? '');
+                                  if (_controller.editor.id != null && _controller.editor.id!.isNotEmpty) {
+                                    final updated = await _controller.updateKahoot(_controller.editor.id!);
+                                    showMessage('Kahoot actualizado');
+                                    await _controller.loadKahoot(updated.id ?? '');
+                                  } else {
+                                    final created = await _controller.createKahoot();
+                                    showMessage('Kahoot creado');
+                                    await _controller.loadKahoot(created.id ?? '');
+                                  }
                                 } catch (e) {
                                   showMessage('Error: $e');
                                 }

@@ -13,4 +13,6 @@ class AdminService {
   Future deleteUser(String id) => _repo.deleteUser(id);
   Future<User> updateUser(String id, User user) => _repo.updateUser(id, user);
   Future<User> patchUser(String id, Map<String, dynamic> changes) => _repo.patchUser(id, changes);
+  Future<Map<String, dynamic>> getMetrics() => _repo.getMetrics();
+  Future<Map<String, dynamic>> seed() => _repo.seed();
 }

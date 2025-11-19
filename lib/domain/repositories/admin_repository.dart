@@ -7,4 +7,7 @@ abstract class AdminRepository {
   Future<User> updateUser(String id, User user);
   Future<User> patchUser(String id, Map<String, dynamic> changes);
   Future<void> deleteUser(String id);
+  Future<Map<String, dynamic>> getMetrics();
+  /// Trigger server-side demo data population. Returns a summary map with counts.
+  Future<Map<String, dynamic>> seed();
 }

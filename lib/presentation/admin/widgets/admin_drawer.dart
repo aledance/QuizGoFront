@@ -3,6 +3,7 @@ import 'package:flutter_application_1/presentation/admin/pages/admin_dashboard_p
 import 'package:flutter_application_1/presentation/admin/pages/users_page.dart';
 import 'package:flutter_application_1/presentation/admin/pages/quizzes_moderation_page.dart';
 import 'package:flutter_application_1/presentation/admin/pages/themes_page.dart';
+import 'package:flutter_application_1/presentation/admin/pages/notifications_page.dart';
 
 class AdminDrawer extends StatelessWidget {
   const AdminDrawer({super.key});
@@ -31,13 +32,18 @@ class AdminDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.quiz),
-            title: const Text('Moderación de quices'),
+            title: const Text('Admin Kahoots!'),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuizzesModerationPage())),
           ),
           ListTile(
             leading: const Icon(Icons.palette),
             title: const Text('Temas'),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ThemesPage())),
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications),
+            title: const Text('Notificaciones'),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsPage())),
           ),
         ],
       ),
