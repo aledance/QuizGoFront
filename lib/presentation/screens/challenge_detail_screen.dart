@@ -148,23 +148,66 @@ class _ChallengeDetailScreenState extends State<ChallengeDetailScreen> {
               ),
             ),
 
-            // bottom actions
+            // bottom actions with improved UI/UX
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextButton(onPressed: _currentIndex > 0 ? _prev : null, child: const Text('Anterior')),
-                ElevatedButton(
-                  onPressed: _selectedOptionIndex != null ? () {
-                    if (_currentIndex < total - 1) {
-                      setState(() {
-                        _currentIndex++;
-                        _selectedOptionIndex = null;
-                      });
-                    } else {
-                      _finish();
-                    }
-                  } : null,
-                  child: Text(_currentIndex < total - 1 ? 'Siguiente' : 'Finalizar'),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    // redirect to main screen when pressed
+                    onPressed: () {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    },
+                    icon: const Icon(Icons.arrow_back, size: 18),
+                    label: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text('Anterior', style: TextStyle(fontSize: 16)),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.deepPurple,
+                      backgroundColor: Colors.white,
+                      side: BorderSide(color: Colors.deepPurple.withOpacity(0.12)),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _selectedOptionIndex != null
+                        ? () {
+                            if (_currentIndex < total - 1) {
+                              setState(() {
+                                _currentIndex++;
+                                _selectedOptionIndex = null;
+                              });
+                            } else {
+                              _finish();
+                            }
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      foregroundColor: Colors.white,
+                      elevation: 6,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _currentIndex < total - 1 ? 'Siguiente' : 'Finalizar',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          _currentIndex < total - 1 ? Icons.navigate_next : Icons.check,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             )
