@@ -1,14 +1,98 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/domain/user/models/user.dart';
+// Corregí la ruta de importación para que sea más estándar, asumiendo la estructura de tu proyecto.
+import 'package:flutter_application_1/infrastructure/home/presentation/home.dart';
 import './login.dart';
 import '/core/utils/colors.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // 1. Asignamos los datos de ejemplo a los controladores al iniciar el widget
+    _usernameController.text = 'jrmat';
+    _emailController.text = 'jrmat@email.com';
+    _passwordController.text = '123';
+  }
+
+  void _handleRegister() {
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    // 2. Lógica de validación con mensajes de error específicos
+    if (username.length < 3) {
+      _showErrorSnackBar('El nombre de usuario debe tener al menos 3 caracteres.');
+      return;
+    }
+
+    // Expresión regular simple para validar el formato del email
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(email)) {
+      _showErrorSnackBar('Por favor, introduce un correo electrónico válido.');
+      return;
+    }
+
+    if (password.length < 3) {
+      _showErrorSnackBar('La contraseña debe tener al menos 3 caracteres.');
+      return;
+    }
+
+    // --- INICIO DE LA SIMULACIÓN DE REGISTRO ---
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('¡Registro exitoso! Bienvenido.'),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    // Creamos la instancia del usuario con los datos validados
+    final newUser = User(
+      username: username,
+      email: email,
+    );
+
+    // Navegamos a la HomePage, limpiando las rutas anteriores
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => HomePage(user: newUser)),
+          (route) => false,
+    );
+    // --- FIN DE LA SIMULACIÓN ---
+  }
+
+  // Función de ayuda para mostrar mensajes de error
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 1. Fondo con gradiente morado
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -23,7 +107,6 @@ class RegisterPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                // 2. Logo/Título de la aplicación
                 const Text(
                   'QuizGo!',
                   style: TextStyle(
@@ -42,15 +125,10 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 40),
-
-                // 3. Formulario (Simulación sin BLoC/Controladores)
                 _buildRegistrationForm(),
                 const SizedBox(height: 30),
-
-                // 4. Botón de Navegación a Login
                 TextButton(
                   onPressed: () {
-                    // Navega a LoginPage y reemplaza la pantalla actual en el stack.
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
                         builder: (context) => const LoginPage(),
@@ -73,38 +151,32 @@ class RegisterPage extends StatelessWidget {
   Widget _buildRegistrationForm() {
     return Column(
       children: [
-        // Campo de Nombre de Usuario
         _AuthInputField(
+          controller: _usernameController,
           icon: Icons.person,
           hintText: 'Nombre de Usuario',
         ),
         const SizedBox(height: 15),
-
-        // Campo de Correo Electrónico
         _AuthInputField(
+          controller: _emailController,
           icon: Icons.email,
           hintText: 'Correo Electrónico',
         ),
         const SizedBox(height: 15),
-
-        // Campo de Contraseña
         _AuthInputField(
+          controller: _passwordController,
           icon: Icons.lock,
           hintText: 'Contraseña',
           isPassword: true,
         ),
         const SizedBox(height: 30),
-
-        // Botón Principal de Registro
         SizedBox(
           width: double.infinity,
           height: 55,
           child: ElevatedButton(
-            onPressed: () {
-              // Lógica para llamar al RegisterUseCase (a través del BLoC/Provider)
-            },
+            onPressed: _handleRegister,
             style: ElevatedButton.styleFrom(
-              backgroundColor: accentPink, // Tono rosa para el acento
+              backgroundColor: accentPink,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -125,15 +197,17 @@ class RegisterPage extends StatelessWidget {
   }
 }
 
-// Widget de Campo de Entrada Reutilizable para Autenticación
+// El widget _AuthInputField no necesita cambios
 class _AuthInputField extends StatelessWidget {
   final IconData icon;
   final String hintText;
   final bool isPassword;
+  final TextEditingController controller;
 
   const _AuthInputField({
     required this.icon,
     required this.hintText,
+    required this.controller,
     this.isPassword = false,
   });
 
@@ -147,6 +221,7 @@ class _AuthInputField extends StatelessWidget {
         border: Border.all(color: Colors.white38),
       ),
       child: TextField(
+        controller: controller,
         obscureText: isPassword,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
