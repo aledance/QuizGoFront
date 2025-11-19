@@ -73,9 +73,11 @@ class UsersController extends ChangeNotifier {
     notifyListeners();
     try {
   final pageResult = await _service.getUsers(page: page, limit: limit, search: search, role: roleFilter, orderBy: orderBy, order: order, status: statusFilter);
-      users = pageResult.data;
-      totalPages = pageResult.totalPages;
-      totalCount = pageResult.totalCount;
+      final data = (pageResult['data'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? <Map<String,dynamic>>[];
+      users = data.map((e) => User.fromJson(e)).toList();
+      final pagination = (pageResult['pagination'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+      totalPages = (pagination['totalPages'] is int) ? pagination['totalPages'] as int : int.tryParse((pagination['totalPages'] ?? '1').toString()) ?? 1;
+      totalCount = (pagination['totalCount'] is int) ? pagination['totalCount'] as int : int.tryParse((pagination['totalCount'] ?? users.length).toString()) ?? users.length;
       error = null;
     } catch (e) {
       error = e.toString();
