@@ -8,8 +8,13 @@ class UsersController extends ChangeNotifier {
   bool loading = false;
   int page = 1;
   int limit = 20;
+  int totalPages = 1;
+  int totalCount = 0;
   String? search;
   String? roleFilter;
+  String? statusFilter;
+  String? orderBy;
+  String? order;
   String? error;
 
   UsersController({required AdminService service}) : _service = service;
@@ -21,6 +26,26 @@ class UsersController extends ChangeNotifier {
 
   void setRoleFilter(String? role) {
     roleFilter = role?.trim().isEmpty == true ? null : role;
+    page = 1;
+  }
+
+  void setStatusFilter(String? status) {
+    statusFilter = status?.trim().isEmpty == true ? null : status;
+    page = 1;
+  }
+
+  void setOrder(String? o) {
+    order = o?.trim().isEmpty == true ? null : o;
+    page = 1;
+  }
+
+  void setOrderBy(String? by) {
+    orderBy = by?.trim().isEmpty == true ? null : by;
+    page = 1;
+  }
+
+  void setLimit(int l) {
+    limit = l;
     page = 1;
   }
 
@@ -47,8 +72,10 @@ class UsersController extends ChangeNotifier {
     loading = true;
     notifyListeners();
     try {
-  final list = await _service.getUsers(page: page, limit: limit, search: search, role: roleFilter);
-      users = list;
+  final pageResult = await _service.getUsers(page: page, limit: limit, search: search, role: roleFilter, orderBy: orderBy, order: order, status: statusFilter);
+      users = pageResult.data;
+      totalPages = pageResult.totalPages;
+      totalCount = pageResult.totalCount;
       error = null;
     } catch (e) {
       error = e.toString();

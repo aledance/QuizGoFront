@@ -99,7 +99,7 @@ class _UsersPageState extends State<UsersPage> {
             )),
             const SizedBox(width: 8),
             DropdownButton<String>(
-              value: _controller.roleFilter,
+              value: _controller.roleFilter ?? '',
               hint: const Text('Filtrar por rol'),
               items: [
                 const DropdownMenuItem<String>(value: '', child: Text('Todos')),
@@ -108,6 +108,65 @@ class _UsersPageState extends State<UsersPage> {
               onChanged: (v) {
                 final val = (v != null && v.isEmpty) ? null : v;
                 _controller.setRoleFilter(val);
+                _controller.loadUsers();
+              },
+            ),
+            const SizedBox(width: 8),
+            const SizedBox(width: 8),
+            DropdownButton<String>(
+              value: _controller.statusFilter ?? '',
+              hint: const Text('Estado'),
+              items: const [
+                DropdownMenuItem<String>(value: '', child: Text('Todos')),
+                DropdownMenuItem<String>(value: 'active', child: Text('Activos')),
+                DropdownMenuItem<String>(value: 'blocked', child: Text('Bloqueados')),
+              ],
+              onChanged: (v) {
+                final val = (v != null && v.isEmpty) ? null : v;
+                _controller.setStatusFilter(val);
+                _controller.loadUsers();
+              },
+            ),
+            const SizedBox(width: 8),
+            DropdownButton<String>(
+              value: _controller.orderBy ?? '',
+              hint: const Text('Ordenar por'),
+              items: const [
+                DropdownMenuItem<String>(value: '', child: Text('Por defecto')),
+                DropdownMenuItem<String>(value: 'createdAt', child: Text('Fecha')),
+                DropdownMenuItem<String>(value: 'name', child: Text('Nombre')),
+                DropdownMenuItem<String>(value: 'email', child: Text('Email')),
+              ],
+              onChanged: (v) {
+                final val = (v != null && v.isEmpty) ? null : v;
+                _controller.setOrderBy(val);
+                _controller.loadUsers();
+              },
+            ),
+            const SizedBox(width: 8),
+            DropdownButton<String>(
+              value: _controller.order ?? 'desc',
+              hint: const Text('Dirección'),
+              items: const [
+                DropdownMenuItem<String>(value: 'asc', child: Text('Asc')),
+                DropdownMenuItem<String>(value: 'desc', child: Text('Desc')),
+              ],
+              onChanged: (v) {
+                _controller.setOrder(v);
+                _controller.loadUsers();
+              },
+            ),
+            const SizedBox(width: 8),
+            DropdownButton<int>(
+              value: _controller.limit,
+              items: const [
+                DropdownMenuItem<int>(value: 10, child: Text('10')),
+                DropdownMenuItem<int>(value: 20, child: Text('20')),
+                DropdownMenuItem<int>(value: 50, child: Text('50')),
+              ],
+              onChanged: (v) {
+                if (v == null) return;
+                _controller.setLimit(v);
                 _controller.loadUsers();
               },
             ),
@@ -132,7 +191,10 @@ class _UsersPageState extends State<UsersPage> {
                             children: [
                               Text(u.email),
                               const SizedBox(height: 4),
-                              Wrap(children: [Chip(label: Text(u.role.value))]),
+                              Wrap(spacing: 6, children: [
+                                Chip(label: Text(u.role.value)),
+                                Chip(label: Text(u.active ? 'Activo' : 'Bloqueado'), backgroundColor: u.active ? Colors.green[50] : Colors.red[50])
+                              ]),
                             ],
                           ),
                           trailing: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -182,7 +244,8 @@ class _UsersPageState extends State<UsersPage> {
                               messenger?.showSnackBar(const SnackBar(content: Text('Usuario actualizado')));
                             }),
                             IconButton(
-                              icon: Icon(u.active ? Icons.block : Icons.check),
+                              icon: Icon(u.active ? Icons.block : Icons.refresh),
+                              tooltip: u.active ? 'Bloquear' : 'Activar',
                               onPressed: () async {
                                 final messenger = ScaffoldMessenger.maybeOf(context);
                                 final isBlocking = u.active; // if active -> action is block
@@ -230,11 +293,17 @@ class _UsersPageState extends State<UsersPage> {
                     )),
                     const SizedBox(height: 8),
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      TextButton(onPressed: () { _controller.prevPage(); _controller.loadUsers(); }, child: const Text('Anterior')),
+                      TextButton(
+                        onPressed: _controller.page > 1 ? () { _controller.prevPage(); _controller.loadUsers(); } : null,
+                        child: const Text('Anterior'),
+                      ),
                       const SizedBox(width: 12),
-                      Text('Página ${_controller.page}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text('Página ${_controller.page} / ${_controller.totalPages}  (Total: ${_controller.totalCount})', style: const TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(width: 12),
-                      TextButton(onPressed: () { _controller.nextPage(); _controller.loadUsers(); }, child: const Text('Siguiente')),
+                      TextButton(
+                        onPressed: _controller.page < (_controller.totalPages <= 0 ? 1 : _controller.totalPages) ? () { _controller.nextPage(); _controller.loadUsers(); } : null,
+                        child: const Text('Siguiente'),
+                      ),
                     ])
                   ]),
           ),

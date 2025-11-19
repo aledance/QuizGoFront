@@ -189,6 +189,7 @@ void main(List<String> args) async {
             // accept both 'q' and 'search' for compatibility with spec and UI
             final searchQ = (params['q'] ?? params['search'] ?? '').trim().toLowerCase();
             final roleQ = (params['role'] ?? '').trim();
+            final statusQ = (params['status'] ?? '').trim();
             final pageParam = params['page'];
             final limitParam = params['limit'];
             // validate page/limit when provided
@@ -221,6 +222,13 @@ void main(List<String> args) async {
             }
             if (roleQ.isNotEmpty) {
               list = list.where((m) => (m['role'] ?? '') == roleQ).toList();
+            }
+            if (statusQ.isNotEmpty) {
+              // status values expected: 'active' or 'blocked'
+              list = list.where((m) {
+                final normalized = normalizeUser(Map<String, dynamic>.from(m));
+                return (normalized['status'] ?? '') == statusQ;
+              }).toList();
             }
             // ordering
             if (orderBy.isNotEmpty) {

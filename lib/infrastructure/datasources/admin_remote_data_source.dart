@@ -8,20 +8,25 @@ class AdminRemoteDataSource {
 
   AdminRemoteDataSource({required this.client, required this.baseUrl, this.authToken = 'admin_token'});
 
-  Future<List<Map<String, dynamic>>> fetchUsers({int page = 1, int limit = 20, String? search, String? role}) async {
-    final roleQuery = role != null ? '&role=$role' : '';
-    // use 'q' parameter (spec) but keep 'search' compatibility
-    final searchParam = search != null ? '&q=$search' : '';
-    final uri = Uri.parse('$baseUrl/admin/users?page=$page&limit=$limit$searchParam$roleQuery');
+  /// Fetch users and return both data and pagination info when available.
+  Future<Map<String, dynamic>> fetchUsers({int page = 1, int limit = 20, String? search, String? role, String? orderBy, String? order, String? status}) async {
+    final params = <String, String>{'page': page.toString(), 'limit': limit.toString()};
+    if (search != null && search.isNotEmpty) params['q'] = search;
+    if (role != null && role.isNotEmpty) params['role'] = role;
+    if (orderBy != null && orderBy.isNotEmpty) params['orderBy'] = orderBy;
+    if (order != null && order.isNotEmpty) params['order'] = order;
+    if (status != null && status.isNotEmpty) params['status'] = status;
+
+    final uri = Uri.parse('$baseUrl/admin/users').replace(queryParameters: params);
     final res = await client.get(uri);
     if (res.statusCode == 200) {
       final body = json.decode(res.body);
-      // Accept either wrapped {data: [...], pagination: {...}} or plain list
       if (body is Map && body.containsKey('data')) {
-        final data = body['data'] as List<dynamic>;
-        return data.cast<Map<String, dynamic>>();
+        final data = (body['data'] as List<dynamic>).cast<Map<String, dynamic>>();
+        final pagination = (body['pagination'] as Map<String, dynamic>? ) ?? <String, dynamic>{};
+        return {'data': data, 'pagination': pagination};
       }
-      if (body is List) return body.cast<Map<String, dynamic>>();
+      if (body is List) return {'data': body.cast<Map<String, dynamic>>(), 'pagination': {}};
       throw Exception('Unexpected response format for users');
     }
     throw Exception('Failed to load users: ${res.statusCode}');
