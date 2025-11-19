@@ -29,8 +29,12 @@ void main(List<String> args) async {
     }
     // ensure active is boolean
     if (!user.containsKey('active')) user['active'] = true;
-    // remove legacy status field if present; 'active' is canonical
-    if (user.containsKey('status')) user.remove('status');
+    // derive compatible response fields: 'status' (string) and 'userType' (alias for role)
+    final isActive = user['active'] == true;
+    user['status'] = isActive ? 'active' : 'blocked';
+    // map internal role names to the 'userType' expected in the spec (e.g. 'educator' -> 'teacher')
+    final role = (user['role'] ?? 'player').toString();
+    user['userType'] = role == 'educator' ? 'teacher' : role;
     return user;
   }
 
