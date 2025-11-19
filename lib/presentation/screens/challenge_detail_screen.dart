@@ -119,9 +119,29 @@ class _ChallengeDetailScreenState extends State<ChallengeDetailScreen> {
                       decoration: BoxDecoration(
                         color: isSelected ? bg.withOpacity(0.85) : bg,
                         borderRadius: BorderRadius.circular(6),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 4, offset: const Offset(0, 2)),
+                        ],
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      child: Align(alignment: Alignment.centerLeft, child: Text(option, style: const TextStyle(color: Colors.white, fontSize: 16))),
+                      child: Row(
+                        children: [
+                          // shape icon in a small white pill
+                          Container(
+                            width: 36,
+                            height: 36,
+                            // transparent background so the white icon sits directly on the colored tile (Kahoot style)
+                            decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(6)),
+                            child: Center(
+                              child: _shapeIcon(i, color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(option, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }),
@@ -159,6 +179,20 @@ class _ChallengeDetailScreenState extends State<ChallengeDetailScreen> {
     setState(() {
       _selectedOptionIndex = index;
     });
+  }
+
+  // Small helper that returns a shape icon similar to Kahoot's shapes
+  Widget _shapeIcon(int i, {Color color = Colors.white}) {
+    switch (i) {
+      case 0:
+        return Icon(Icons.change_history, color: color, size: 18); // triangle
+      case 1:
+        return Icon(Icons.diamond, color: color, size: 18); // diamond
+      case 2:
+        return Icon(Icons.circle, color: color, size: 18); // circle
+      default:
+        return Icon(Icons.crop_square, color: color, size: 18); // square
+    }
   }
 
   void _skip() {
