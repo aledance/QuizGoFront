@@ -17,6 +17,7 @@ class AppEntry extends StatelessWidget {
 
     return MaterialApp(
       title: 'QuizGo - Demo UI',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
       home: const ChallengeListScreen(),
       routes: {
