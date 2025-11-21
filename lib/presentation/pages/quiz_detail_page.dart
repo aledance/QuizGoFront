@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/sample_quizzes.dart';
+import '../services/challenge_service.dart';
 
 class QuizDetailPage extends StatelessWidget {
   final Quiz quiz;
@@ -36,6 +37,32 @@ class QuizDetailPage extends StatelessWidget {
                   Text('Creado: ${quiz.createdAt.toLocal().toString().split('.').first}', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                   const SizedBox(height: 20),
                   SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () {}, child: const Text('Iniciar Kahoot'))),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        // Simple local flow to create a challenge for this kahoot using ChallengeService
+                        final service = await _createService();
+                        try {
+                          final res = await service.createChallengeUC.call({'kahootId': quiz.id});
+                          final pin = res['challengePin'];
+                          final link = res['shareLink'];
+                          showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                    title: const Text('Reto creado'),
+                                    content: Text('PIN: $pin\nCompartir: $link'),
+                                    actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cerrar'))],
+                                  ));
+                        } catch (e) {
+                          showDialog(context: context, builder: (_) => AlertDialog(title: const Text('Error'), content: Text(e.toString()), actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))]));
+                        }
+                      },
+                      icon: const Icon(Icons.share),
+                      label: const Text('Crear Reto Asíncrono'),
+                    ),
+                  ),
                 ],
               ),
             )
@@ -43,5 +70,10 @@ class QuizDetailPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<ChallengeService> _createService() async {
+    // Factory is synchronous but kept async for future DI changes
+    return ChallengeService();
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/challenge_service.dart';
 import '../components/categories_grid.dart';
 import '../components/channel_cards_carousel.dart';
 import '../data/categories_data.dart';
@@ -28,6 +29,89 @@ class _HomePageState extends State<HomePage> {
       final messages = List.generate(2, (i) => {'from': membersList[i % membersList.length], 'text': 'Último mensaje ${i + 1} del grupo', 'date': DateTime.now().subtract(Duration(minutes: (i + 1) * 5)).toIso8601String()});
       return {'name': g.name, 'members': g.members, 'description': 'Grupo de estudio sobre ${g.name}', 'membersList': membersList, 'messages': messages};
     }).toList();
+  }
+
+  Future<void> _handleCreateChallengePromo(BuildContext context) async {
+    final service = ChallengeService();
+
+    final kahootController = TextEditingController();
+    DateTime? expiration;
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Crear Reto Asíncrono'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: kahootController,
+                  decoration: const InputDecoration(labelText: 'Kahoot ID', hintText: 'Introduce el id del kahoot'),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(expiration == null ? 'Sin fecha de expiración' : 'Expira: ${expiration!.toLocal().toString().split(' ').first}'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now().add(const Duration(days: 1)),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(const Duration(days: 365)),
+                        );
+                        if (picked != null) setState(() => expiration = picked);
+                      },
+                      child: const Text('Elegir fecha'),
+                    ),
+                  ],
+                )
+              ],
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancelar')),
+              FilledButton(
+                onPressed: () async {
+                  final kahootId = kahootController.text.trim();
+                  if (kahootId.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kahoot ID es obligatorio')));
+                    return;
+                  }
+
+                  try {
+                    final payload = <String, dynamic>{'kahootId': kahootId};
+                    if (expiration != null) payload['expirationDate'] = expiration!.toUtc().toIso8601String();
+                    final res = await service.createChallengeUC.call(payload);
+                    Navigator.of(context).pop(true);
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text('Reto creado'),
+                        content: Text('PIN: ${res['challengePin']}\nCompartir: ${res['shareLink']}'),
+                        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cerrar'))],
+                      ),
+                    );
+                  } catch (e) {
+                    Navigator.of(context).pop(false);
+                    showDialog(context: context, builder: (_) => AlertDialog(title: const Text('Error'), content: Text(e.toString()), actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))]));
+                  }
+                },
+                child: const Text('Crear'),
+              ),
+            ],
+          );
+        });
+      },
+    );
+
+    // Optionally react to result
+    if (result == true) {
+      // could refresh UI or show toast
+    }
   }
 
   Future<void> _handleCreateGroup() async {
@@ -115,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                   _StudyGroupsSection(groups: _userGroups, onCreate: _handleCreateGroup),
                   const SizedBox(height: 24),
                   _SectionHeader(title: 'Explora más formas de jugar'),
-                  _PurplePromo(onPressed: () {}),
+                  _PurplePromo(onPressed: () => _handleCreateChallengePromo(context)),
                   const SizedBox(height: 24),
                 ],
               ),
