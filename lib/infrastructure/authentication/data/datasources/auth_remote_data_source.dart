@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'auth_api.dart';
 import 'dart:convert';
-import '../../../../core/repositories/auth_repository.dart';
+import '../../../../domain/repositories/auth_repository.dart';
 
 
 class AuthRemoteDataSourceImpl implements AuthRepository {

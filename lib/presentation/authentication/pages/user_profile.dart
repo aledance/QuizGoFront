@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 // Asegúrate de importar tus archivos necesarios
-import '/core/utils/colors.dart';
 import '/domain/user/models/user.dart'; // <<<--- 1. IMPORTA EL MODELO USER
 import './login.dart';
 
@@ -24,7 +23,7 @@ class ProfilePage extends StatelessWidget {
         width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [primaryPurple, darkPurple],
+            colors: [Colors.red],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -43,7 +42,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 20),
               const CircleAvatar(
                 radius: 60,
-                backgroundColor: accentPink,
+                backgroundColor: Colors.amber,
                 child: Icon(
                   Icons.person,
                   size: 70,
@@ -85,7 +84,7 @@ class ProfilePage extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: accentPink,
+                      backgroundColor: Colors.amberAccent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

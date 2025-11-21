@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 // Asegúrate de que las rutas de importación sean correctas para tu proyecto
-import 'package:flutter_application_1/core/utils/colors.dart';
 import 'package:flutter_application_1/presentation/authentication/pages/user_profile.dart';
 import 'package:flutter_application_1/domain/user/models/user.dart';
 
@@ -42,7 +41,7 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [primaryPurple, darkPurple],
+            colors: [Colors.purple, Colors.deepPurple],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -57,11 +56,11 @@ class _HomePageState extends State<HomePage> {
                 if (index != 0) return;
                 setState(() => _selectedIndex = index);
               },
-              backgroundColor: darkPurple.withOpacity(0.5),
+              backgroundColor: Colors.deepPurple.withOpacity(0.5),
               labelType: NavigationRailLabelType.all,
-              selectedIconTheme: const IconThemeData(color: accentPink, size: 30),
+              selectedIconTheme: const IconThemeData(color: Colors.pinkAccent, size: 30),
               unselectedIconTheme: IconThemeData(color: Colors.white.withOpacity(0.7), size: 30),
-              selectedLabelTextStyle: const TextStyle(color: accentPink),
+              selectedLabelTextStyle: const TextStyle(color: Colors.pinkAccent),
               unselectedLabelTextStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
               destinations: [
                 const NavigationRailDestination(
@@ -117,8 +116,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        backgroundColor: darkPurple.withOpacity(0.95),
-        selectedItemColor: accentPink,
+        backgroundColor: Colors.deepPurple.withOpacity(0.95),
+        selectedItemColor: Colors.pinkAccent,
         unselectedItemColor: Colors.white.withOpacity(0.7),
         onTap: (index) {
           // No permitimos la selección de ítems desactivados
@@ -142,7 +141,7 @@ class _HomePageContent extends StatelessWidget {
       // Se añade el gradiente también aquí para que el fondo sea consistente
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [primaryPurple, darkPurple],
+          colors: [Colors.purple, Colors.purpleAccent],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -184,7 +183,7 @@ class _HomePageContent extends StatelessWidget {
                       context,
                       icon: Icons.add_circle_outline,
                       label: 'Crear Quiz',
-                      color: accentPink,
+                      color: Colors.pinkAccent,
                       onTap: () {
                         // TODO: Navegar a la página de creación de quizzes
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -244,7 +243,7 @@ class _HomePageContent extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProfilePage(user: user))),
-            child: const CircleAvatar(radius: 30, backgroundColor: accentPink, child: Icon(Icons.person, color: Colors.white, size: 35)),
+            child: const CircleAvatar(radius: 30, backgroundColor: Colors.pinkAccent, child: Icon(Icons.person, color: Colors.white, size: 35)),
           ),
         ],
       ),

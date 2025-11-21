@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'settings_page.dart';
+import '../authentication/pages/login.dart';
+import '../authentication/pages/register.dart';
 
 class SessionPage extends StatelessWidget {
   const SessionPage({super.key});
@@ -41,14 +43,20 @@ class SessionPage extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {},
-                    child: const Text('Iniciar sesión'),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const LoginPage()),  );
+                    },
+                  child: const Text('Iniciar sesión'),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const RegisterPage()),  );
+                    },
                     child: const Text('Registrarse'),
                   ),
                 ),

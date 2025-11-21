@@ -3,7 +3,6 @@ import 'package:flutter_application_1/domain/user/models/user.dart';
 // Corregí la ruta de importación para que sea más estándar, asumiendo la estructura de tu proyecto.
 import 'package:flutter_application_1/presentation/home/pages/home.dart';
 import './login.dart';
-import '/core/utils/colors.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -93,10 +92,12 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body:Stack(
+        children:[
+          Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [primaryPurple, darkPurple],
+            colors: [Colors.purple,Colors.deepPurple],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -144,6 +145,22 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         ),
+        ),
+
+          Positioned(
+            top: 0,
+            left: 0,
+            child: SafeArea(
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
+                onPressed: () {
+                  // Esta acción navega a la pantalla anterior en la pila.
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -176,7 +193,7 @@ class _RegisterPageState extends State<RegisterPage> {
           child: ElevatedButton(
             onPressed: _handleRegister,
             style: ElevatedButton.styleFrom(
-              backgroundColor: accentPink,
+              backgroundColor: Colors.amber,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

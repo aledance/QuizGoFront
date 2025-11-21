@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 // Asegúrate de importar tus archivos necesarios
 // Las siguientes 3 importaciones no son estrictamente necesarias para esta simulación, pero las mantenemos
-import 'package:flutter_application_1/core/repositories/auth_repository.dart';
+import 'package:flutter_application_1/domain/repositories/auth_repository.dart';
 import 'package:flutter_application_1/infrastructure/authentication/data/repositories/auth_repository_impl.dart';
 import 'package:flutter_application_1/infrastructure/authentication/data/datasources/auth_remote_data_source.dart';
 import 'package:http/http.dart' as http;
 
 // Importaciones para navegación
 import './register.dart';
-import '/core/utils/colors.dart';
 import '/domain/user/models/user.dart';
 import '../../home/pages/home.dart';
 
@@ -110,59 +109,77 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [primaryPurple, darkPurple],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body:Stack(
+          children:[
+            Container(
+              decoration: const BoxDecoration(
+              gradient: LinearGradient(
+              colors: [Colors.purple,Colors.deepPurple],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Text(
-                  'QuizGo!',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Bienvenido de vuelta',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                _buildLoginForm(),
-                const SizedBox(height: 30),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => const RegisterPage(),
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text(
+                    'QuizGo!',
+                      style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
                       ),
-                    );
-                  },
-                  child: const Text(
-                    '¿No tienes cuenta? Regístrate',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Bienvenido de vuelta',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  _buildLoginForm(),
+                  const SizedBox(height: 30),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterPage(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      '¿No tienes cuenta? Regístrate',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+
+            Positioned(
+              top: 0,
+              left: 0,
+              child: SafeArea(
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
+                  onPressed: () {
+                    // Esta acción navega a la pantalla anterior en la pila.
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ),
+        ],
+        ),
+      );
   }
 
   Widget _buildLoginForm() {
@@ -187,7 +204,7 @@ class _LoginPageState extends State<LoginPage> {
           child: ElevatedButton(
             onPressed: _handleLogin,
             style: ElevatedButton.styleFrom(
-              backgroundColor: accentPink,
+              backgroundColor: Colors.amber,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

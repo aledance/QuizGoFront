@@ -1,7 +1,7 @@
 // lib/features/authentication/data/repositories/auth_repository_impl.dart
 
 // Importa el Puerto (interfaz) desde la capa core/
-import '../../../../core/repositories/auth_repository.dart';
+import '../../../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
