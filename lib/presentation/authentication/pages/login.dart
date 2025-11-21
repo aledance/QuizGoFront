@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 import './register.dart';
 import '/core/utils/colors.dart';
 import '/domain/user/models/user.dart';
-import '../../../home/presentation/home.dart';
+import '../../home/pages/home.dart';
 
 
 // Convertido a StatefulWidget

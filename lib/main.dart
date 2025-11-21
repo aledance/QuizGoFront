@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 // 1. Importa el archivo de la página de registro
-import 'package:flutter_application_1/infrastructure/authentication/presentation/pages/register.dart';
+import './presentation/authentication/pages/register.dart';
 
 void main() {
   runApp(const MyApp());

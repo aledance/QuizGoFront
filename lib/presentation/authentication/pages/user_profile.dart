@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 // Asegúrate de importar tus archivos necesarios
 import '/core/utils/colors.dart';
 import '/domain/user/models/user.dart'; // <<<--- 1. IMPORTA EL MODELO USER
-import '/infrastructure/authentication/presentation/pages/login.dart';
+import './login.dart';
 
 class ProfilePage extends StatelessWidget {
   // <<<--- 2. AÑADE LA PROPIEDAD PARA RECIBIR EL USUARIO

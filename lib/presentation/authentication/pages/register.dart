@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/domain/user/models/user.dart';
 // Corregí la ruta de importación para que sea más estándar, asumiendo la estructura de tu proyecto.
-import 'package:flutter_application_1/infrastructure/home/presentation/home.dart';
+import 'package:flutter_application_1/presentation/home/pages/home.dart';
 import './login.dart';
 import '/core/utils/colors.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 // Asegúrate de que las rutas de importación sean correctas para tu proyecto
 import 'package:flutter_application_1/core/utils/colors.dart';
-import 'package:flutter_application_1/infrastructure/authentication/presentation/pages/user_profile.dart';
+import 'package:flutter_application_1/presentation/authentication/pages/user_profile.dart';
 import 'package:flutter_application_1/domain/user/models/user.dart';
 
 class HomePage extends StatefulWidget {
