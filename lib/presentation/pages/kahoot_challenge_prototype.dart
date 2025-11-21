@@ -317,8 +317,8 @@ class _AnswerUIState extends State<AnswerUI> {
   bool _loading = false;
 
   static const _colors = [Color(0xFFEA4335), Color(0xFF1E88E5), Color(0xFFF4B400), Color(0xFF0F9D58)];
-  static const _labels = ['A', 'B', 'C', 'D'];
-
+  static const _shapeIcons = [Icons.change_history, Icons.diamond, Icons.circle, Icons.crop_square];
+  static const _shapeNames = ['Opcion A', 'Opcion B', 'Opcion C', 'Opcion D'];
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -330,7 +330,7 @@ class _AnswerUIState extends State<AnswerUI> {
           const Text('Responder pregunta', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           TextField(controller: pinController, decoration: const InputDecoration(labelText: 'PIN del reto')),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
           const Text('Elige la respuesta:', style: TextStyle(fontSize: 16)),
           const SizedBox(height: 12),
 
@@ -357,14 +357,15 @@ class _AnswerUIState extends State<AnswerUI> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      // Shape icon (white) without extra background to match screenshot
                       Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.95), shape: BoxShape.circle),
-                        child: Center(child: Text(_labels[i], style: const TextStyle(fontWeight: FontWeight.bold))),
+                        width: 28,
+                        height: 28,
+                        alignment: Alignment.center,
+                        child: Icon(_shapeIcons[i], color: Colors.white, size: 18),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(child: Text('Opción ${i + 1}', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold))),
+                      Expanded(child: Text(_shapeNames[i], style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold))),
                     ],
                   ),
                 ),
