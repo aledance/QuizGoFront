@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class KahootChallengePrototype extends StatefulWidget {
   const KahootChallengePrototype({Key? key}) : super(key: key);
@@ -172,65 +173,133 @@ class _CreateChallengeUIState extends State<CreateChallengeUI> {
 }
 
 // ------------------ UNIRSE A CHALLENGE ------------------
-class JoinChallengeUI extends StatelessWidget {
+class JoinChallengeUI extends StatefulWidget {
   const JoinChallengeUI({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final nicknameController = TextEditingController();
-    final pinController = TextEditingController();
+  State<JoinChallengeUI> createState() => _JoinChallengeUIState();
+}
 
+class _JoinChallengeUIState extends State<JoinChallengeUI> {
+  final TextEditingController _nicknameController = TextEditingController();
+  final TextEditingController _pinController = TextEditingController();
+  bool _joining = false;
+  bool _joined = false;
+  String? _playerId;
+  String? _playerToken;
+
+  @override
+  void dispose() {
+    _nicknameController.dispose();
+    _pinController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Unirse a Reto', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            TextField(controller: nicknameController, decoration: const InputDecoration(labelText: 'Nickname')),
-            TextField(controller: pinController, decoration: const InputDecoration(labelText: 'PIN del Reto (6 dígitos)')),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  final nickname = nicknameController.text;
-                  final pin = pinController.text;
-
-                  if (nickname.isEmpty || pin.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nickname and PIN are required')));
-                    return;
-                  }
-
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text('Unido al reto'),
-                      content: const Text('playerId: uuid\nplayerToken: jwt-token'),
-                      actions: [
-                        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar')),
-                      ],
-                    ),
-                  );
-                },
-                child: const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Text('Unirse (POST /challenges/:id/players)')),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text('Respuesta (simulada):', style: TextStyle(fontWeight: FontWeight.bold)),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              color: Colors.grey[300],
-              child: const Text('{ "playerId": "uuid", "playerToken": "jwt-token" }'),
-            )
-          ],
-        ),
+        child: _joined ? _buildJoined(context) : _buildForm(context),
       ),
     );
+  }
+
+  Widget _buildForm(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Unirse al reto', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        TextField(controller: _nicknameController, decoration: const InputDecoration(labelText: 'Nickname')),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _pinController,
+          decoration: const InputDecoration(labelText: 'PIN del Reto (6 dígitos)'),
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          maxLength: 6,
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: _joining ? null : () => _onJoin(context),
+            style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+            child: _joining ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator.adaptive()) : const Text('Unirse'),
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Text('Pista: introduce tu Nickname y el PIN de 6 dígitos que aparece en el reto.'),
+      ],
+    );
+  }
+
+  Widget _buildJoined(BuildContext context) {
+    final maskedToken = _playerToken == null ? '' : _playerToken!.replaceRange(4, _playerToken!.length - 4, '...');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Bienvenido', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        Text('Jugador: ${_nicknameController.text}'),
+        const SizedBox(height: 8),
+        Text('ID de jugador: ${_playerId ?? ''}'),
+        const SizedBox(height: 8),
+        Row(children: [
+          Expanded(child: Text('Token: $maskedToken', overflow: TextOverflow.ellipsis)),
+            IconButton(
+              icon: const Icon(Icons.copy),
+              onPressed: _playerToken == null
+                  ? null
+                  : () async {
+                      await Clipboard.setData(ClipboardData(text: _playerToken!));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Token copiado')));
+                    },
+            )
+        ]),
+        const SizedBox(height: 12),
+        FilledButton(
+          onPressed: () {
+            // Placeholder: navigate to the challenge view or return to prototype
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Entrando al reto (simulado)')));
+          },
+          child: const Text('Entrar al reto'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _onJoin(BuildContext context) async {
+    final nickname = _nicknameController.text.trim();
+    final pin = _pinController.text.trim();
+    if (nickname.isEmpty || pin.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nickname y PIN son obligatorios')));
+      return;
+    }
+    if (pin.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('El PIN debe tener 6 dígitos')));
+      return;
+    }
+    setState(() => _joining = true);
+    try {
+      // Simulate network call
+      await Future.delayed(const Duration(milliseconds: 400));
+      final pid = 'player-${DateTime.now().millisecondsSinceEpoch.toString().substring(9)}';
+      final token = 'tok-${DateTime.now().millisecondsSinceEpoch}';
+      setState(() {
+        _playerId = pid;
+        _playerToken = token;
+        _joined = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Unido al reto (simulado)')));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+    } finally {
+      setState(() => _joining = false);
+    }
   }
 }
 
@@ -244,10 +313,11 @@ class AnswerUI extends StatefulWidget {
 
 class _AnswerUIState extends State<AnswerUI> {
   final pinController = TextEditingController();
-  int slideIndex = 0;
-  int selectedAnswer = 0;
-  double timeMs = 1500;
+  int selectedAnswer = -1; // -1 none, 0-3 options
   bool _loading = false;
+
+  static const _colors = [Color(0xFFEA4335), Color(0xFF1E88E5), Color(0xFFF4B400), Color(0xFF0F9D58)];
+  static const _labels = ['A', 'B', 'C', 'D'];
 
   @override
   Widget build(BuildContext context) {
@@ -261,20 +331,47 @@ class _AnswerUIState extends State<AnswerUI> {
           const SizedBox(height: 12),
           TextField(controller: pinController, decoration: const InputDecoration(labelText: 'PIN del reto')),
           const SizedBox(height: 12),
-          Row(children: [
-            const Text('Slide:'),
-            const SizedBox(width: 12),
-            DropdownButton<int>(value: slideIndex, items: List.generate(10, (i) => DropdownMenuItem(value: i, child: Text('Slide ${i + 1}'))), onChanged: (v) => setState(() => slideIndex = v ?? 0)),
-          ]),
+          const Text('Elige la respuesta:', style: TextStyle(fontSize: 16)),
           const SizedBox(height: 12),
-          const Text('Selecciona la respuesta:'),
-          const SizedBox(height: 8),
-          Wrap(spacing: 8, children: List.generate(4, (i) {
-            final isSelected = i == selectedAnswer;
-            return ChoiceChip(label: Text('Opción ${i + 1}'), selected: isSelected, onSelected: (_) => setState(() => selectedAnswer = i));
-          })),
-          const SizedBox(height: 12),
-          Row(children: [const Text('Tiempo (ms):'), const SizedBox(width: 12), Expanded(child: Slider(value: timeMs, min: 100, max: 3000, divisions: 29, label: timeMs.round().toString(), onChanged: (v) => setState(() => timeMs = v)))]),
+
+          // 2x2 grid of tiles
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1.4,
+            physics: const NeverScrollableScrollPhysics(),
+            children: List.generate(4, (i) {
+              final isSelected = selectedAnswer == i;
+              return GestureDetector(
+                onTap: () => setState(() => selectedAnswer = i),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: _colors[i],
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 6))] : null,
+                    border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.95), shape: BoxShape.circle),
+                        child: Center(child: Text(_labels[i], style: const TextStyle(fontWeight: FontWeight.bold))),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text('Opción ${i + 1}', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold))),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
@@ -294,14 +391,19 @@ class _AnswerUIState extends State<AnswerUI> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('PIN requerido')));
       return;
     }
+    if (selectedAnswer < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selecciona una opción')));
+      return;
+    }
     setState(() => _loading = true);
     try {
       await Future.delayed(const Duration(milliseconds: 300));
+      final isCorrect = selectedAnswer == 0; // simulate option A as correct
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('Respuesta enviada (simulada)'),
-          content: Text('status: OK\nisCorrect: ${selectedAnswer == 0 ? 'true' : 'false'}\npointsEarned: ${selectedAnswer == 0 ? 1000 : 0}\ncurrentScore: 1200'),
+          title: Text(isCorrect ? '¡Correcto!' : 'Incorrecto'),
+          content: Text('status: OK\nisCorrect: $isCorrect\npointsEarned: ${isCorrect ? 1000 : 0}\ncurrentScore: 1200'),
           actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar'))],
         ),
       );
