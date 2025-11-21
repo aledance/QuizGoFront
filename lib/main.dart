@@ -1,25 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-// 1. Importa el archivo de la página de registro
-import './presentation/authentication/pages/register.dart';
+import 'presentation/main.dart' as presentation;
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class DevHttpOverrides extends HttpOverrides {
+  final Set<String> trustedHosts = const {
+    'picsum.photos',
+    'i.picsum.photos',
+  };
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'QuizGo!',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        // Puedes definir un tema global si lo deseas
-        primarySwatch: Colors.purple,
-      ),
-      // 2. Instancia RegisterPage como la pantalla de inicio
-      home: const RegisterPage(),
-    );
+  HttpClient createHttpClient(SecurityContext? context) {
+    final client = super.createHttpClient(context);
+    client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+      return trustedHosts.contains(host);
+    };
+    return client;
   }
+}
+
+void main() {
+  HttpOverrides.global = DevHttpOverrides();
+  runApp(const presentation.PresentationApp());
 }
