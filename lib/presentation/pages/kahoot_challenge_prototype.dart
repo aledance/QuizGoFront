@@ -319,6 +319,13 @@ class _AnswerUIState extends State<AnswerUI> {
   static const _colors = [Color(0xFFEA4335), Color(0xFF1E88E5), Color(0xFFF4B400), Color(0xFF0F9D58)];
   static const _shapeIcons = [Icons.change_history, Icons.diamond, Icons.circle, Icons.crop_square];
   static const _shapeNames = ['Opcion A', 'Opcion B', 'Opcion C', 'Opcion D'];
+
+  @override
+  void dispose() {
+    pinController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -326,62 +333,93 @@ class _AnswerUIState extends State<AnswerUI> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Responder pregunta', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          TextField(controller: pinController, decoration: const InputDecoration(labelText: 'PIN del reto')),
-          const SizedBox(height: 20),
-          const Text('Elige la respuesta:', style: TextStyle(fontSize: 16)),
-          const SizedBox(height: 12),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Responder pregunta', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
 
-          // 2x2 grid of tiles
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.4,
-            physics: const NeverScrollableScrollPhysics(),
-            children: List.generate(4, (i) {
-              final isSelected = selectedAnswer == i;
-              return GestureDetector(
-                onTap: () => setState(() => selectedAnswer = i),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _colors[i],
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 6))] : null,
-                    border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Shape icon (white) without extra background to match screenshot
-                      Container(
-                        width: 28,
-                        height: 28,
-                        alignment: Alignment.center,
-                        child: Icon(_shapeIcons[i], color: Colors.white, size: 18),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(_shapeNames[i], style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold))),
-                    ],
+              // --- Question Text ---
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                child: const Text(
+                  '¿Cuál es el framework de UI para crear apps nativas desde una base de código?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // --- Image Placeholder ---
+              Container(
+                height: 150,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(12),
+                  image: const DecorationImage(
+                    image: NetworkImage('https://flutter.dev/images/flutter-logo-sharing.png'),
+                    fit: BoxFit.contain,
                   ),
                 ),
-              );
-            }),
-          ),
+              ),
+              const SizedBox(height: 20),
 
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _loading ? null : _submit,
-              child: Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: _loading ? const CircularProgressIndicator.adaptive() : const Text('Enviar respuesta')),
-            ),
+              // --- Answer Options ---
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.4,
+                physics: const NeverScrollableScrollPhysics(),
+                children: List.generate(4, (i) {
+                  final isSelected = selectedAnswer == i;
+                  return GestureDetector(
+                    onTap: () => setState(() => selectedAnswer = i),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _colors[i],
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 6))] : null,
+                        border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 28,
+                            height: 28,
+                            alignment: Alignment.center,
+                            child: Icon(_shapeIcons[i], color: Colors.white, size: 18),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(child: Text(_shapeNames[i], style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold))),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _loading ? null : _submit,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: _loading ? const CircularProgressIndicator.adaptive() : const Text('Enviar respuesta'),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ]),
+        ),
       ),
     );
   }
