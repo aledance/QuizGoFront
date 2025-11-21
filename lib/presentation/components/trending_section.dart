@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import '../data/sample_quizzes.dart';
+import '../pages/quiz_detail_page.dart';
 
 class TrendingSection extends StatefulWidget {
   final List<Quiz> items;
@@ -192,6 +193,9 @@ class _TrendingSectionState extends State<TrendingSection> {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => QuizDetailPage(quiz: quiz)));
+      },
       onPanStart: (details) {
         _startDrag(context, details.globalPosition, quiz, delta);
       },

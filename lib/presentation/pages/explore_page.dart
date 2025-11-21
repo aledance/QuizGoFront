@@ -8,6 +8,7 @@ import '../components/filter_chips.dart';
 import '../components/hashtag_card.dart';
 import '../components/partner_collections_section.dart';
 import '../components/quiz_card.dart';
+import 'quiz_detail_page.dart';
 import '../components/search_bar.dart';
 import '../components/trending_section.dart';
 import '../data/categories_data.dart';
@@ -172,9 +173,13 @@ Widget _resultsGridBuilder(List<Quiz> items, BuildContext context) {
         childAspectRatio: 1.6,
       ),
       itemCount: items.length,
-      itemBuilder: (context, index) {
+        itemBuilder: (context, index) {
         final q = items[index];
-        return QuizCard(quiz: q, compact: true);
+        return QuizCard(
+          quiz: q,
+          compact: true,
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => QuizDetailPage(quiz: q))),
+        );
       },
     ),
   );

@@ -1,6 +1,8 @@
 import 'dart:math';
 
+
 import 'package:flutter/material.dart';
+import '../pages/quiz_detail_page.dart';
 
 import '../data/sample_extra_content.dart';
 import '../data/sample_quizzes.dart';
@@ -259,7 +261,9 @@ class _QuizPreviewCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton.tonal(
-              onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => QuizDetailPage(quiz: quiz)));
+                },
               style: FilledButton.styleFrom(minimumSize: const Size(0, 40)),
               child: const Text('Ver'),
             ),
@@ -269,6 +273,7 @@ class _QuizPreviewCard extends StatelessWidget {
     );
   }
 }
+
 
 class _Badge extends StatelessWidget {
   final String label;

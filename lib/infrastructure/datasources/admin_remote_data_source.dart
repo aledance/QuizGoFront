@@ -18,7 +18,7 @@ class AdminRemoteDataSource {
     if (status != null && status.isNotEmpty) params['status'] = status;
 
     final uri = Uri.parse('$baseUrl/admin/users').replace(queryParameters: params);
-    final res = await client.get(uri);
+    final res = await client.get(uri).timeout(const Duration(seconds: 10));
     if (res.statusCode == 200) {
       final body = json.decode(res.body);
       if (body is Map && body.containsKey('data')) {
@@ -34,7 +34,7 @@ class AdminRemoteDataSource {
 
   Future<Map<String, dynamic>> getMetrics() async {
     final uri = Uri.parse('$baseUrl/admin/metrics');
-    final res = await client.get(uri);
+    final res = await client.get(uri).timeout(const Duration(seconds: 10));
     if (res.statusCode == 200) {
       return json.decode(res.body) as Map<String, dynamic>;
     }
@@ -44,7 +44,7 @@ class AdminRemoteDataSource {
 
   Future<Map<String, dynamic>> seed() async {
     final uri = Uri.parse('$baseUrl/admin/_seed');
-    final res = await client.post(uri, headers: {'Content-Type': 'application/json'});
+    final res = await client.post(uri, headers: {'Content-Type': 'application/json'}).timeout(const Duration(seconds: 20));
     if (res.statusCode == 201 || res.statusCode == 200) {
       return json.decode(res.body) as Map<String, dynamic>;
     }
@@ -53,14 +53,14 @@ class AdminRemoteDataSource {
 
   Future<Map<String, dynamic>> createUser(Map<String, dynamic> data) async {
     final uri = Uri.parse('$baseUrl/admin/users');
-    final res = await client.post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode(data));
+    final res = await client.post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode(data)).timeout(const Duration(seconds: 10));
     if (res.statusCode == 201) return json.decode(res.body) as Map<String, dynamic>;
     throw Exception('Failed to create user: ${res.statusCode}');
   }
 
   Future<Map<String, dynamic>> updateUser(String id, Map<String, dynamic> data) async {
     final uri = Uri.parse('$baseUrl/admin/users/$id');
-    final res = await client.put(uri, headers: {'Content-Type': 'application/json'}, body: json.encode(data));
+    final res = await client.put(uri, headers: {'Content-Type': 'application/json'}, body: json.encode(data)).timeout(const Duration(seconds: 10));
     if (res.statusCode == 200) return json.decode(res.body) as Map<String, dynamic>;
     throw Exception('Failed to update user: ${res.statusCode}');
   }
@@ -69,7 +69,7 @@ class AdminRemoteDataSource {
     final uri = Uri.parse('$baseUrl/admin/users/$id');
     final headers = <String, String>{};
     if (authToken.isNotEmpty) headers['authorization'] = 'Bearer $authToken';
-    final res = await client.delete(uri, headers: headers);
+    final res = await client.delete(uri, headers: headers).timeout(const Duration(seconds: 10));
     if (res.statusCode == 204) return;
     throw Exception('Failed to delete user: ${res.statusCode}');
   }
@@ -79,7 +79,7 @@ class AdminRemoteDataSource {
 
     final headers = {'Content-Type': 'application/json'};
     if (authToken.isNotEmpty) headers['authorization'] = 'Bearer $authToken';
-    final res = await client.patch(uri, headers: headers, body: json.encode(changes));
+    final res = await client.patch(uri, headers: headers, body: json.encode(changes)).timeout(const Duration(seconds: 10));
     if (res.statusCode == 200) return json.decode(res.body) as Map<String, dynamic>;
     throw Exception('Failed to patch user: ${res.statusCode}');
   }

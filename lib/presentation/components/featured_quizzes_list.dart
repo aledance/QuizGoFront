@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/sample_quizzes.dart';
+import '../pages/quiz_detail_page.dart';
 
 class FeaturedQuizzesList extends StatefulWidget {
   final List<Quiz> items;
@@ -105,7 +106,9 @@ class _FeaturedRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => QuizDetailPage(quiz: quiz)));
+      },
       borderRadius: BorderRadius.circular(14),
       child: Container(
         decoration: BoxDecoration(
