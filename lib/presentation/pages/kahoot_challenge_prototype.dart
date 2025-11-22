@@ -316,74 +316,74 @@ class _AnswerUIState extends State<AnswerUI> {
   int selectedAnswer = -1; // -1 none, 0-3 options
   bool _loading = false;
 
-  static const _colors = [Color(0xFFEA4335), Color(0xFF1E88E5), Color(0xFFF4B400), Color(0xFF0F9D58)];
-  static const _shapeIcons = [Icons.change_history, Icons.diamond, Icons.circle, Icons.crop_square];
-  static const _shapeNames = ['Opcion A', 'Opcion B', 'Opcion C', 'Opcion D'];
+    static const _colors = [Color(0xFFEA4335), Color(0xFF1E88E5), Color(0xFFF4B400), Color(0xFF0F9D58)];
+    static const _shapeIcons = [Icons.change_history, Icons.diamond_outlined, Icons.circle, Icons.crop_square];
+    static const _shapeNames = ['Opcion A', 'Opcion B', 'Opcion C', 'Opcion D'];
 
-  @override
-  void dispose() {
-    pinController.dispose();
-    super.dispose();
-  }
+    @override
+    void dispose() {
+      pinController.dispose();
+      super.dispose();
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Responder pregunta', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
+    @override
+    Widget build(BuildContext context) {
+      return Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Responder pregunta', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
 
-              // --- Question Text ---
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                child: const Text(
-                  '¿Cuál es el framework de UI para crear apps nativas desde una base de código?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // --- Image Placeholder ---
-              Container(
-                height: 150,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(12),
-                  image: const DecorationImage(
-                    image: NetworkImage('https://flutter.dev/images/flutter-logo-sharing.png'),
-                    fit: BoxFit.contain,
+                // --- Question Text ---
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                  child: const Text(
+                    '¿Cuál es el framework de UI para crear apps nativas desde una base de código?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-              // --- Answer Options ---
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.4,
-                physics: const NeverScrollableScrollPhysics(),
-                children: List.generate(4, (i) {
-                  final isSelected = selectedAnswer == i;
-                  return GestureDetector(
-                    onTap: () => setState(() => selectedAnswer = i),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: _colors[i],
-                        borderRadius: BorderRadius.circular(12),
+                // --- Image Placeholder ---
+                Container(
+                  height: 150,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(12),
+                    image: const DecorationImage(
+                      image: NetworkImage('https://flutter.dev/images/flutter-logo-sharing.png'),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // --- Answer Options ---
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.4,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: List.generate(4, (i) {
+                    final isSelected = selectedAnswer == i;
+                    return GestureDetector(
+                      onTap: () => setState(() => selectedAnswer = i),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: _colors[i],
+                          borderRadius: BorderRadius.circular(12),
                         boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 6))] : null,
                         border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
                       ),
