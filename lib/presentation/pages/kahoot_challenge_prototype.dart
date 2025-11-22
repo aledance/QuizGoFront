@@ -16,7 +16,7 @@ class _KahootChallengePrototypeState extends State<KahootChallengePrototype> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        title: const Text('Kahoot Challenge Prototype'),
+        title: const Text('Modos de juegos kahoot'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -121,13 +121,23 @@ class _CreateChallengeUIState extends State<CreateChallengeUI> {
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: const Color.fromARGB(255, 0, 0, 0)),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                  color: Colors.white,
+                ),
                 child: Row(
                   children: [
                     const Icon(Icons.quiz, color: Colors.deepPurple),
                     const SizedBox(width: 12),
-                    Expanded(child: Text(_selectedKahootTitle ?? 'Selecciona un Kahoot', style: const TextStyle(fontSize: 16))),
-                    const Icon(Icons.arrow_forward_ios, size: 16, color: Color.fromARGB(255, 0, 0, 0)),
+                    Expanded(
+                      child: Text(
+                        _selectedKahootTitle ?? 'Selecciona un Kahoot',
+                        style: const TextStyle(fontSize: 16, color: Colors.black87),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
                   ],
                 ),
               ),
