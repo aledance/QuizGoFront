@@ -121,13 +121,13 @@ class _CreateChallengeUIState extends State<CreateChallengeUI> {
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.white),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: const Color.fromARGB(255, 0, 0, 0)),
                 child: Row(
                   children: [
                     const Icon(Icons.quiz, color: Colors.deepPurple),
                     const SizedBox(width: 12),
                     Expanded(child: Text(_selectedKahootTitle ?? 'Selecciona un Kahoot', style: const TextStyle(fontSize: 16))),
-                    const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                    const Icon(Icons.arrow_forward_ios, size: 16, color: Color.fromARGB(255, 0, 0, 0)),
                   ],
                 ),
               ),
@@ -487,6 +487,7 @@ class _RankingUIState extends State<RankingUI> {
             ),
           ),
           const SizedBox(height: 12),
+
           Expanded(
             child: _rows.isEmpty
                 ? const Center(child: Text('No hay datos'))
@@ -522,7 +523,9 @@ class _RankingUIState extends State<RankingUI> {
         {'nickname': 'Gamer22', 'totalScore': 4700, 'timeAvgMs': 2100},
         {'nickname': 'Speedy', 'totalScore': 4300, 'timeAvgMs': 1700},
       ];
-      setState(() => _rows = simulated);
+      setState(() {
+        _rows = simulated;
+      });
     } catch (e) {
       showDialog(context: context, builder: (_) => AlertDialog(title: const Text('Error'), content: Text(e.toString()), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))]));
     } finally {
