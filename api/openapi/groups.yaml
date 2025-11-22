@@ -1,0 +1,579 @@
+openapi: 3.0.3
+info:
+  title: API - Gestión de Grupos y Roles
+  description: |
+    Especificación OpenAPI para la épica "Gestión de Grupos y Roles".
+    Contiene endpoints comunes para manejo de grupos de estudio, roles, invitaciones,
+    asignación de quizzes y leaderboards.
+  version: 1.0.0
+servers:
+  - url: /api
+    description: API base (ruta relativa)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    GroupSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        role:
+          type: string
+          description: "Rol del usuario en el grupo (admin|member)"
+        memberCount:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, role, memberCount, createdAt]
+    GroupCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+      required: [name]
+    GroupCreateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        adminId:
+          type: string
+          format: uuid
+        memberCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, adminId, memberCount, createdAt]
+    GroupPartialUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    TransferAdminRequest:
+      type: object
+      properties:
+        newAdminId:
+          type: string
+          format: uuid
+      required: [newAdminId]
+    TransferAdminResponse:
+      type: object
+      properties:
+        groupId:
+          type: string
+          format: uuid
+        previousAdmin:
+          type: object
+          properties:
+            userId:
+              type: string
+              format: uuid
+            newRole:
+              type: string
+        newAdmin:
+          type: object
+          properties:
+            userId:
+              type: string
+              format: uuid
+            newRole:
+              type: string
+        transferredAt:
+          type: string
+          format: date-time
+      required: [groupId, previousAdmin, newAdmin, transferredAt]
+    InvitationRequest:
+      type: object
+      properties:
+        expiresIn:
+          type: string
+          description: "Expiración en formato legible, ej. 7d, 24h"
+      required: [expiresIn]
+    InvitationResponse:
+      type: object
+      properties:
+        groupId:
+          type: string
+          format: uuid
+        invitationLink:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+      required: [groupId, invitationLink, expiresAt]
+    JoinRequest:
+      type: object
+      properties:
+        invitationToken:
+          type: string
+      required: [invitationToken]
+    JoinResponse:
+      type: object
+      properties:
+        groupId:
+          type: string
+          format: uuid
+        groupName:
+          type: string
+        joinedAt:
+          type: string
+          format: date-time
+        role:
+          type: string
+      required: [groupId, groupName, joinedAt, role]
+    AssignQuizRequest:
+      type: object
+      properties:
+        quizId:
+          type: string
+          format: uuid
+        availableFrom:
+          type: string
+          format: date-time
+        availableTo:
+          type: string
+          format: date-time
+      required: [quizId, availableFrom, availableTo]
+    AssignedQuizResponse:
+      type: object
+      properties:
+        groupId:
+          type: string
+          format: uuid
+        quizId:
+          type: string
+          format: uuid
+        assignedBy:
+          type: string
+          format: uuid
+        availableFrom:
+          type: string
+          format: date-time
+        availableTo:
+          type: string
+          format: date-time
+      required: [groupId, quizId, assignedBy, availableFrom, availableTo]
+    LeaderboardEntry:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        completedQuizzes:
+          type: integer
+        totalPoints:
+          type: integer
+        position:
+          type: integer
+    QuizTopPlayer:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        score:
+          type: integer
+    QuizLeaderboardResponse:
+      type: object
+      properties:
+        quizId:
+          type: string
+          format: uuid
+        groupId:
+          type: string
+          format: uuid
+        topPlayers:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizTopPlayer'
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+paths:
+  /groups:
+    get:
+      summary: Obtener todos los grupos del usuario autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de grupos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupSummary'
+        '401':
+          description: Usuario no autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Crear un nuevo Grupo de Estudio y asignar admin al usuario actual
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupCreateRequest'
+      responses:
+        '201':
+          description: Grupo creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupCreateResponse'
+        '400':
+          description: Campos requeridos faltantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Usuario no autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /groups/{groupId}:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      summary: Editar parcialmente la información del grupo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupPartialUpdate'
+      responses:
+        '200':
+          description: Grupo actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  updatedAt:
+                    type: string
+                    format: date-time
+        '403':
+          description: No es administrador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Grupo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Eliminar permanentemente un grupo (solo admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Grupo eliminado exitosamente
+        '403':
+          description: Usuario no es administrador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Grupo no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /groups/{groupId}/members/{memberId}:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: memberId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      summary: Eliminar un miembro del grupo o abandono por parte del miembro
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Miembro eliminado exitosamente
+        '401':
+          description: Usuario no autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: No es administrador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Miembro o Grupo no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /groups/{groupId}/transfer-admin:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      summary: Transferir la administración a otro miembro del grupo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferAdminRequest'
+      responses:
+        '201':
+          description: Administración transferida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferAdminResponse'
+        '400':
+          description: Nuevo admin no pertenece al grupo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: No es administrador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /groups/{groupId}/invitations:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      summary: Generar un enlace de invitación para el grupo (solo admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitationRequest'
+      responses:
+        '201':
+          description: Invitación generada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResponse'
+        '401':
+          description: Usuario no autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: No es administrador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /groups/join:
+    post:
+      summary: Unirse a un grupo mediante token de invitación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JoinRequest'
+      responses:
+        '201':
+          description: Usuario se unió al grupo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JoinResponse'
+        '400':
+          description: Token inválido o expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /groups/{groupId}/quizzes:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      summary: Agregar o asignar un Kahoot existente al grupo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignQuizRequest'
+      responses:
+        '201':
+          description: Quiz asignado al grupo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignedQuizResponse'
+        '400':
+          description: Fechas inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Miembro intentó agregar un quiz no compartido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Quiz no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /groups/{groupId}/leaderboard:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Mostrar el leaderboard general del grupo
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Ranking grupal
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaderboardEntry'
+        '403':
+          description: Usuario no pertenece al grupo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Grupo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /groups/{groupId}/quizzes/{quizId}/leaderboard:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: quizId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Mostrar leaderboard individual de un Kahoot dentro del grupo
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Mejoras puntuaciones para el Kahoot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizLeaderboardResponse'
+        '404':
+          description: Grupo o Kahoot inexistente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+x-examples:
+  get-groups:
+    curl: |
+      curl -H "Authorization: Bearer <JWT>" /api/groups
+  create-group:
+    curl: |
+      curl -X POST -H "Authorization: Bearer <JWT>" -H "Content-Type: application/json" -d '{"name":"Mi Grupo"}' /api/groups
