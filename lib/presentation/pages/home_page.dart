@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
 import '../components/categories_grid.dart';
 import '../components/channel_cards_carousel.dart';
 import '../data/categories_data.dart';
@@ -7,6 +9,15 @@ import 'session_page.dart';
 import 'notifications_page.dart';
 import 'create_study_group_page.dart';
 import 'study_groups_page.dart';
+import 'groups_page.dart';
+
+// Infrastructure + usecases imports to create a quick wiring point from Home
+import '../../infrastructure/services/groups_api.dart';
+import '../../infrastructure/repositories/group_repository_impl.dart';
+import '../../application/usecases/get_groups_usecase.dart';
+import '../../application/usecases/create_group_usecase.dart';
+import '../../application/usecases/join_group_usecase.dart';
+import '../../application/usecases/get_leaderboard_usecase.dart';
 
 class HomePage extends StatefulWidget {
   final VoidCallback? onCreateTap;
@@ -253,12 +264,15 @@ class _StudyGroupsSection extends StatelessWidget {
               const Spacer(),
               TextButton(
                 onPressed: () {
-                  final maps = _mockStudyGroups.map((g) {
-                    final membersList = List.generate(g.members.clamp(3, 12), (i) => 'Usuario ${i + 1}');
-                    final messages = List.generate(3, (i) => {'from': membersList[i % membersList.length], 'text': 'Último mensaje ${i + 1} del grupo', 'date': DateTime.now().subtract(Duration(minutes: (i + 1) * 5)).toIso8601String()});
-                    return {'name': g.name, 'members': g.members, 'description': 'Grupo de estudio sobre ${g.name}', 'membersList': membersList, 'messages': messages};
-                  }).toList();
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => StudyGroupsPage(groups: maps)));
+                  // Navegar a la interfaz completa de Grupos (usa el API y repo local).
+                  final api = GroupsApi(baseUrl: 'http://localhost:8080', token: '', client: http.Client());
+                  final repo = GroupRepositoryImpl(api: api);
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => GroupsPage(
+                        getGroupsUseCase: GetGroupsUseCase(repo),
+                        createGroupUseCase: CreateGroupUseCase(repo),
+                        joinGroupUseCase: JoinGroupUseCase(repo),
+                        getLeaderboardUseCase: GetGroupLeaderboardUseCase(repo),
+                      )));
                 },
                 child: const Text('Ver todos'),
               ),
