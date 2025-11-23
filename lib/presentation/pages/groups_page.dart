@@ -68,9 +68,58 @@ class _GroupsPageState extends State<GroupsPage> {
     );
 
     if (result != null && result.isNotEmpty) {
-      await controller.createGroup(result);
+      final created = await controller.createGroup(result);
+      if (created != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+          const Icon(Icons.check_circle_outline, color: Colors.white),
+          const SizedBox(width: 8),
+            Expanded(
+            child: RichText(
+              text: TextSpan(
+              style: const TextStyle(color: Colors.white),
+              children: <TextSpan>[
+                const TextSpan(text: 'Grupo "'),
+                TextSpan(
+                  text: created.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+                const TextSpan(text: '" creado con éxito.'),
+              ],
+              ),
+            ),
+            ),
+              ],
+            ),
+            backgroundColor: Colors.green.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            action: SnackBarAction(
+              label: 'VER',
+              textColor: Colors.white,
+              onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => GroupDetailPage(
+              group: created,
+              getLeaderboardUseCase: widget.getLeaderboardUseCase,
+            ),
+          ));
+              },
+            ),
+          ),
+        );
+        // Optionally navigate to detail
+        // Navigator.of(context).push(MaterialPageRoute(builder: (_) => GroupDetailPage(group: created, getLeaderboardUseCase: widget.getLeaderboardUseCase)));
+      } else {
+        final err = controller.error ?? 'No se pudo crear el grupo';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $err')));
+      }
     }
   }
+
 
   Future<void> _showJoinDialog() async {
     final tokenCtrl = TextEditingController();
@@ -93,7 +142,13 @@ class _GroupsPageState extends State<GroupsPage> {
     );
 
     if (token != null && token.isNotEmpty) {
-      await controller.joinWithToken(token);
+      final joined = await controller.joinWithToken(token);
+      if (joined != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Te uniste al grupo "${joined.name}"')));
+      } else {
+        final err = controller.error ?? 'No se pudo unir al grupo';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $err')));
+      }
     }
   }
 
