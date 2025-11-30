@@ -492,15 +492,32 @@ class _ReportsDemoSectionState extends State<_ReportsDemoSection> {
                 children: [
                   Text('Informe de sesión (demo)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                   const Spacer(),
-                  FilledButton(
-                    onPressed: _loading ? null : _loadReport,
-                    child: const Text('Cargar informe'),
-                  ),
+                    const SizedBox(width: 8),
+                    // allow the button to shrink if space is constrained
+                    Flexible(
+                      flex: 0,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 160),
+                        child: FilledButton(
+                          onPressed: _loading ? null : _loadReport,
+                          child: const Text('Cargar informe', overflow: TextOverflow.ellipsis),
+                        ),
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 8),
               if (_loading) const Center(child: Padding(padding: EdgeInsets.all(8.0), child: CircularProgressIndicator())),
               if (_error != null) Padding(padding: const EdgeInsets.only(top:8.0), child: Text('Error: ${_error}', style: TextStyle(color: scheme.error))),
+                if (_error != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      'Error: ${_error}',
+                      style: TextStyle(color: scheme.error),
+                      softWrap: true,
+                    ),
+                  ),
               if (_report != null) ...[
                 const SizedBox(height: 8),
                 Text('Título: ' + _report!.title, style: Theme.of(context).textTheme.titleSmall),
