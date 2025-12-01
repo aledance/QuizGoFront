@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/domain/user/models/user.dart';
 // Corregí la ruta de importación para que sea más estándar, asumiendo la estructura de tu proyecto.
-import 'package:flutter_application_1/presentation/home/pages/home.dart';
+import '../../pages/home_page.dart';
 import './login.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -65,7 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     // Navegamos a la HomePage, limpiando las rutas anteriores
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => HomePage(user: newUser)),
+      MaterialPageRoute(builder: (_) => HomePage()),
           (route) => false,
     );
     // --- FIN DE LA SIMULACIÓN ---

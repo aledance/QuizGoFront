@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 // Importaciones para navegación
 import './register.dart';
 import '/domain/user/models/user.dart';
-import '../../home/pages/home.dart';
+import '../../pages/home_page.dart';
 
 
 // Convertido a StatefulWidget
@@ -68,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
 
       // Navega a la nueva HomePage, pasando los datos del usuario
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomePage(user: user)),
+        MaterialPageRoute(builder: (_) => HomePage()),
       );
     } else {
       // Fallo: Muestra un error de credenciales inválidas
