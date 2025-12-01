@@ -3,6 +3,7 @@ import '../components/categories_grid.dart';
 import '../components/channel_cards_carousel.dart';
 import '../data/categories_data.dart';
 import 'kahoot_editor_page.dart';
+import 'kahoot_challenge_prototype.dart';
 import 'session_page.dart';
 import 'notifications_page.dart';
 import 'create_study_group_page.dart';
@@ -29,6 +30,8 @@ class _HomePageState extends State<HomePage> {
       return {'name': g.name, 'members': g.members, 'description': 'Grupo de estudio sobre ${g.name}', 'membersList': membersList, 'messages': messages};
     }).toList();
   }
+
+// Presentation: challenge UI removed — revert to previous behavior (no service calls here)
 
   Future<void> _handleCreateGroup() async {
     final res = await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CreateStudyGroupPage()));
@@ -115,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                   _StudyGroupsSection(groups: _userGroups, onCreate: _handleCreateGroup),
                   const SizedBox(height: 24),
                   _SectionHeader(title: 'Explora más formas de jugar'),
-                  _PurplePromo(onPressed: () {}),
+                  _PurplePromo(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const KahootChallengePrototype()))),
                   const SizedBox(height: 24),
                 ],
               ),
