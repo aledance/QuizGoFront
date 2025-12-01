@@ -31,11 +31,11 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   @override
   void initState() {
     super.initState();
-    _service = KahootService(baseUrl: API_BASE_URL);
+    _service = KahootService(baseUrl: apiBaseUrl);
     _controller = KahootEditorController(service: _service, initial: EditorKahoot());
     _listener = () => setState(() {});
     _controller.addListener(_listener);
-  _themesSource = ThemeRemoteDataSource(client: http.Client(), baseUrl: API_BASE_URL);
+  _themesSource = ThemeRemoteDataSource(client: http.Client(), baseUrl: apiBaseUrl);
   _themesFuture = _themesSource.listThemes();
     _titleController = TextEditingController(text: _controller.editor.title);
     _descController = TextEditingController(text: _controller.editor.description);

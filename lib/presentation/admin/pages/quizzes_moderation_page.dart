@@ -22,7 +22,7 @@ class _QuizzesModerationPageState extends State<QuizzesModerationPage> {
   @override
   void initState() {
     super.initState();
-    _dataSource = KahootRemoteDataSource(client: http.Client(), baseUrl: API_BASE_URL);
+    _dataSource = KahootRemoteDataSource(client: http.Client(), baseUrl: apiBaseUrl);
     _futureList = _dataSource.listKahoots();
   }
 

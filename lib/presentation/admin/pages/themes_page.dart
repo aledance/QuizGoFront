@@ -19,7 +19,7 @@ class _ThemesPageState extends State<ThemesPage> {
   @override
   void initState() {
     super.initState();
-    _dataSource = ThemeRemoteDataSource(client: http.Client(), baseUrl: API_BASE_URL);
+    _dataSource = ThemeRemoteDataSource(client: http.Client(), baseUrl: apiBaseUrl);
     _future = _dataSource.listThemes();
   }
 
