@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/presentation/admin/widgets/admin_drawer.dart';
 import 'package:flutter_application_1/infrastructure/datasources/kahoot_remote_data_source.dart';
+import 'package:flutter_application_1/config.dart';
 import 'package:flutter_application_1/presentation/pages/kahoot_editor_page.dart';
 
 class QuizzesModerationPage extends StatefulWidget {
@@ -21,7 +22,7 @@ class _QuizzesModerationPageState extends State<QuizzesModerationPage> {
   @override
   void initState() {
     super.initState();
-    _dataSource = KahootRemoteDataSource(client: http.Client());
+    _dataSource = KahootRemoteDataSource(client: http.Client(), baseUrl: API_BASE_URL);
     _futureList = _dataSource.listKahoots();
   }
 

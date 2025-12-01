@@ -1,9 +1,8 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/presentation/admin/pages/admin_dashboard_page.dart';
 import '../controllers/kahoot_editor_controller.dart';
 import '../services/kahoot_service.dart';
+import 'package:flutter_application_1/config.dart';
 import '../../application/editor/kahoot_editor.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/infrastructure/datasources/theme_remote_data_source.dart';
@@ -32,12 +31,11 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   @override
   void initState() {
     super.initState();
-    final mockBaseUrl = Platform.isAndroid ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
-    _service = KahootService(baseUrl: mockBaseUrl);
+    _service = KahootService(baseUrl: API_BASE_URL);
     _controller = KahootEditorController(service: _service, initial: EditorKahoot());
     _listener = () => setState(() {});
     _controller.addListener(_listener);
-  _themesSource = ThemeRemoteDataSource(client: http.Client());
+  _themesSource = ThemeRemoteDataSource(client: http.Client(), baseUrl: API_BASE_URL);
   _themesFuture = _themesSource.listThemes();
     _titleController = TextEditingController(text: _controller.editor.title);
     _descController = TextEditingController(text: _controller.editor.description);

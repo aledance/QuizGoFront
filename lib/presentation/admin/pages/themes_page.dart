@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/presentation/admin/widgets/admin_drawer.dart';
 import 'package:flutter_application_1/infrastructure/datasources/theme_remote_data_source.dart';
+import 'package:flutter_application_1/config.dart';
 
 class ThemesPage extends StatefulWidget {
   const ThemesPage({super.key});
@@ -18,7 +19,7 @@ class _ThemesPageState extends State<ThemesPage> {
   @override
   void initState() {
     super.initState();
-    _dataSource = ThemeRemoteDataSource(client: http.Client());
+    _dataSource = ThemeRemoteDataSource(client: http.Client(), baseUrl: API_BASE_URL);
     _future = _dataSource.listThemes();
   }
 
