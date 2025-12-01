@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: scheme.surface,
         elevation: 0,
         title: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
               GestureDetector(
@@ -73,33 +73,49 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Hola, Team Morado',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              FilledButton(
-                onPressed: () {},
-                style: FilledButton.styleFrom(backgroundColor: const Color(0xFF00A88C), padding: const EdgeInsets.symmetric(horizontal: 20)),
-                child: const Text('Actualizar'),
-              ),
-              const SizedBox(width: 12),
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsPage()));
-                },
-                icon: const Icon(Icons.notifications_none),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Hola, Team Morado',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 120),
+                  child: FilledButton(
+                    onPressed: () {},
+                    style: FilledButton.styleFrom(backgroundColor: const Color(0xFF00A88C), padding: const EdgeInsets.symmetric(horizontal: 12)),
+                    child: const Text('Actualizar', overflow: TextOverflow.ellipsis),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsPage()));
+                  },
+                  icon: const Icon(Icons.notifications_none),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [
@@ -490,34 +506,31 @@ class _ReportsDemoSectionState extends State<_ReportsDemoSection> {
             children: [
               Row(
                 children: [
-                  Text('Informe de sesión (demo)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                  const Spacer(),
-                    const SizedBox(width: 8),
-                    // allow the button to shrink if space is constrained
-                    Flexible(
-                      flex: 0,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 160),
-                        child: FilledButton(
-                          onPressed: _loading ? null : _loadReport,
-                          child: const Text('Cargar informe', overflow: TextOverflow.ellipsis),
-                        ),
-                      ),
+                  Expanded(
+                    child: Text('Informe de sesión (demo)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(width: 8),
+                  // allow the button to shrink if space is constrained
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 160),
+                    child: FilledButton(
+                      onPressed: _loading ? null : _loadReport,
+                      child: const Text('Cargar informe', overflow: TextOverflow.ellipsis),
                     ),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
               if (_loading) const Center(child: Padding(padding: EdgeInsets.all(8.0), child: CircularProgressIndicator())),
-              if (_error != null) Padding(padding: const EdgeInsets.only(top:8.0), child: Text('Error: ${_error}', style: TextStyle(color: scheme.error))),
-                if (_error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(
-                      'Error: ${_error}',
-                      style: TextStyle(color: scheme.error),
-                      softWrap: true,
-                    ),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'Error: ${_error}',
+                    style: TextStyle(color: scheme.error),
+                    softWrap: true,
                   ),
+                ),
               if (_report != null) ...[
                 const SizedBox(height: 8),
                 Text('Título: ' + _report!.title, style: Theme.of(context).textTheme.titleSmall),
