@@ -19,6 +19,8 @@ extension QuestionTypeX on QuestionType {
       case 'true_false':
       case 'trueFalse':
         return QuestionType.trueFalse;
+      case 'multiple_choice':
+        return QuestionType.quiz;
       default:
         return QuestionType.quiz;
     }

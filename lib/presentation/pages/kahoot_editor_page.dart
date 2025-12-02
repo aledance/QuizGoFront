@@ -1,12 +1,14 @@
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_application_1/presentation/admin/pages/admin_dashboard_page.dart';
 import '../controllers/kahoot_editor_controller.dart';
 import '../services/kahoot_service.dart';
 import '../../application/editor/kahoot_editor.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/infrastructure/datasources/theme_remote_data_source.dart';
+import 'dart:io';
 
 
 class KahootEditorPage extends StatefulWidget {
@@ -24,8 +26,11 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   late VoidCallback _listener;
   late TextEditingController _titleController;
   late TextEditingController _descController;
+  late TextEditingController _pointsController;
+  late TextEditingController _timeController;
   late TextEditingController _questionController;
   List<TextEditingController> _answerControllers = [];
+  final ImagePicker _picker = ImagePicker();
   late ThemeRemoteDataSource _themesSource;
   late Future<List<Map<String, dynamic>>> _themesFuture;
 
@@ -44,6 +49,8 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
     _titleController.addListener(() => _controller.setTitle(_titleController.text));
     _descController.addListener(() => _controller.setDescription(_descController.text));
     _setupQuestionControllers();
+    _pointsController = TextEditingController(text: _controller.selectedQuestion.points.toString());
+    _timeController = TextEditingController(text: _controller.selectedQuestion.timeLimit.toString());
 
 
 
@@ -66,6 +73,8 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
     _controller.removeListener(_listener);
     _titleController.dispose();
     _descController.dispose();
+    _pointsController.dispose();
+    _timeController.dispose();
     _questionController.dispose();
     for (final c in _answerControllers) {
       c.dispose();
@@ -86,10 +95,24 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
 
     try {
       _questionController.dispose();
+      _pointsController.dispose();
+      _timeController.dispose();
     } catch (_) {}
     for (final c in _answerControllers) {
       c.dispose();
     }
+
+    _pointsController = TextEditingController(text: _controller.selectedQuestion.points.toString());
+    _pointsController.addListener(() {
+      final points = int.tryParse(_pointsController.text) ?? 1000;
+      _controller.setQuestionPoints(points);
+    });
+
+    _timeController = TextEditingController(text: _controller.selectedQuestion.timeLimit.toString());
+    _timeController.addListener(() {
+      final time = int.tryParse(_timeController.text) ?? 20;
+      _controller.setQuestionTimeLimit(time);
+    });
 
     final selected = _controller.selectedQuestion;
     _questionController = TextEditingController(text: selected.text);
@@ -102,6 +125,14 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
         final val = _answerControllers[idx].text;
         if (idx < _controller.selectedQuestion.answers.length) _controller.selectedQuestion.answers[idx].text = val;
       });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+
+      _controller.setCoverImageId(image.path);
     }
   }
 
@@ -144,12 +175,28 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                     Row(
                       children: [
                         GestureDetector(
-                          onTap: () {},
+                          onTap: _pickImage,
                           child: Container(
                             width: 72,
                             height: 72,
                             decoration: BoxDecoration(color: placeholderColor, borderRadius: BorderRadius.circular(8)),
-                            child: Icon(Icons.photo_camera, size: 28, color: placeholderIconColor),
+                            clipBehavior: Clip.antiAlias,
+                            child: _controller.selectedQuestion.mediaId == null
+                            // CASO 1: No hay imagen, muestra el icono
+                                ? Icon(Icons.photo_camera, size: 28, color: placeholderIconColor)
+                            // CASO 2: Hay una imagen, muestra el Image.network con su lógica de error
+                                : Image.network(
+                              _controller.selectedQuestion.mediaId!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Si la URL no es http (es una ruta local), intenta mostrarla con Image.file
+                                if (!_controller.selectedQuestion.mediaId!.startsWith('http')) {
+                                  return Image.file(File(_controller.selectedQuestion.mediaId!), fit: BoxFit.cover);
+                                }
+                                // Si falla la carga de la URL http, muestra un icono de error
+                                return Icon(Icons.error, color: placeholderIconColor);
+                              },
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -390,9 +437,25 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                     padding: const EdgeInsets.all(20.0),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        GestureDetector(
-                          onTap: () {},
-                          child: Container(width: 96, height: 96, decoration: BoxDecoration(color: placeholderColor, borderRadius: BorderRadius.circular(8)), child: Icon(Icons.photo_camera, size: 32, color: placeholderIconColor)),
+                         GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            width: 96,
+                            height: 96,
+                            decoration: BoxDecoration(color: placeholderColor, borderRadius: BorderRadius.circular(8)),
+                            clipBehavior: Clip.antiAlias,
+                             child: _controller.selectedQuestion.mediaId != null
+                                ? Image.network(
+                                    _controller.selectedQuestion.mediaId!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      if (!_controller.selectedQuestion.mediaId!.startsWith('http')) {
+                                        return Image.file(File(_controller.selectedQuestion.mediaId!), fit: BoxFit.cover);
+                                      }
+                                      return Icon(Icons.error, color: placeholderIconColor);
+                                    },
+                                  )
+                                : Icon(Icons.photo_camera, size: 32, color: placeholderIconColor)),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
@@ -419,8 +482,29 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                             const SizedBox(height: 8),
                             TextField(decoration: const InputDecoration(labelText: 'Enunciado'), controller: _questionController),
                             const SizedBox(height: 12),
-
-
+                            Row(
+                              children: [
+                                const Text('Puntos: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 100,
+                                  child: TextField(
+                                    controller: _pointsController,
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                const Text('Tiempo (s): ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 100,
+                                  child: TextField(
+                                    controller: _timeController,
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                ),
+                              ],
+                            ),
                             Column(children: List.generate(_controller.selectedQuestion.answers.length, (i) {
                               final a = _controller.selectedQuestion.answers[i];
                               final color = [Colors.red, Colors.blue, Colors.yellow[700], Colors.green][i % 4] ?? Colors.grey;
