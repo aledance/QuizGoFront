@@ -17,6 +17,11 @@ class ThemeRemoteDataSource {
       final parsed = jsonDecode(res.body) as List<dynamic>;
       return parsed.cast<Map<String, dynamic>>();
     }
+    // If the backend does not expose a /themes endpoint, return an empty list
+    // instead of throwing a hard exception to avoid crashing the UI.
+    if (res.statusCode == 404) {
+      return <Map<String, dynamic>>[];
+    }
     throw Exception('Failed to list themes: ${res.statusCode} ${res.body}');
   }
 

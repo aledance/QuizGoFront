@@ -36,7 +36,13 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
     _listener = () => setState(() {});
     _controller.addListener(_listener);
   _themesSource = ThemeRemoteDataSource(client: http.Client(), baseUrl: apiBaseUrl);
-  _themesFuture = _themesSource.listThemes();
+  // Load themes but catch any error so the UI doesn't crash; return empty list on failure.
+  _themesFuture = _themesSource.listThemes().catchError((e) {
+    // Log the error for debugging and return an empty list so the FutureBuilder can continue.
+    // ignore: avoid_print
+    print('Failed to load themes: $e');
+    return <Map<String, dynamic>>[];
+  });
     _titleController = TextEditingController(text: _controller.editor.title);
     _descController = TextEditingController(text: _controller.editor.description);
     _titleController.addListener(() => _controller.setTitle(_titleController.text));
