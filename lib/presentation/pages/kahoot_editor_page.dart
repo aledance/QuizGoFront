@@ -29,6 +29,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   late TextEditingController _pointsController;
   late TextEditingController _timeController;
   late TextEditingController _questionController;
+  late TextEditingController _categoryController;
   List<TextEditingController> _answerControllers = [];
   final ImagePicker _picker = ImagePicker();
   late ThemeRemoteDataSource _themesSource;
@@ -46,8 +47,10 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   _themesFuture = _themesSource.listThemes();
     _titleController = TextEditingController(text: _controller.editor.title);
     _descController = TextEditingController(text: _controller.editor.description);
+    _categoryController = TextEditingController(text: _controller.editor.category ?? '');
     _titleController.addListener(() => _controller.setTitle(_titleController.text));
     _descController.addListener(() => _controller.setDescription(_descController.text));
+    _categoryController.addListener(() => _controller.setCategory(_categoryController.text));
     _setupQuestionControllers();
     _pointsController = TextEditingController(text: _controller.selectedQuestion.points.toString());
     _timeController = TextEditingController(text: _controller.selectedQuestion.timeLimit.toString());
@@ -60,6 +63,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
 
         _titleController.text = _controller.editor.title;
         _descController.text = _controller.editor.description;
+        _categoryController.text = _controller.editor.category ?? '';
         _setupQuestionControllers();
         setState(() {});
       }).catchError((e) {
@@ -73,6 +77,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
     _controller.removeListener(_listener);
     _titleController.dispose();
     _descController.dispose();
+        _categoryController.dispose();
     _pointsController.dispose();
     _timeController.dispose();
     _questionController.dispose();
@@ -250,6 +255,28 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                               TextField(
                                 decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
                                 controller: _descController,
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  const Text('Estado: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  const SizedBox(width: 8),
+                                  DropdownButton<String>(
+                                    value: (_controller.editor.status == null || _controller.editor.status == '') ? 'draft' : _controller.editor.status,
+                                    items: ['draft', 'published'].map((s) => DropdownMenuItem<String>(value: s, child: Text(s))).toList(),
+                                    onChanged: (v) {
+                                      if (v != null) _controller.setStatus(v);
+                                      setState(() {});
+                                    },
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: TextField(
+                                      decoration: const InputDecoration(labelText: 'Categoría'),
+                                      controller: _categoryController,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

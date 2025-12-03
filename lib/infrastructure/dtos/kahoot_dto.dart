@@ -46,19 +46,17 @@ class KahootDto {
       );
 
 
-  Map<String, dynamic> toJsonRequest({required String authorId, required String themeId}) => {
+  Map<String, dynamic> toJsonRequest({required String authorId, String? themeId}) => {
     'authorId': authorId,
-
-    //'author': {'authorId': authorId, 'name': author['name'] ?? ''},
-        'title': title,
-        'description': description,
-        'coverImageId': coverImageId,
-        'visibility': visibility,
-        'status': status,
-        'category': category,
-        'themeId': themeId,
-        'questions': questions.map((q) => q.toJson()).toList(),
-      };
+    'title': title,
+    'description': description,
+    'coverImageId': coverImageId,
+    'visibility': visibility,
+    'status': status,
+    'category': category,
+    'themeId': themeId,
+    'questions': questions.map((q) => q.toJson()).toList(),
+  };
 
   Kahoot toEntity() => Kahoot(
         id: id,

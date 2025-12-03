@@ -17,6 +17,11 @@ class ThemeRemoteDataSource {
       final parsed = jsonDecode(res.body) as List<dynamic>;
       return parsed.cast<Map<String, dynamic>>();
     }
+    // If the backend doesn't expose /themes, return an empty list instead of
+    // throwing to avoid crashing the UI. Log the response for debugging.
+    // ignore: avoid_print
+    print('Theme list request failed: ${res.statusCode} ${res.body}');
+    if (res.statusCode == 404) return <Map<String, dynamic>>[];
     throw Exception('Failed to list themes: ${res.statusCode} ${res.body}');
   }
 

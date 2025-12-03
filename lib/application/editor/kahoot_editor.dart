@@ -80,6 +80,8 @@ class EditorKahoot {
   String? coverImageId;
   String visibility;
   String? themeId;
+  String? status;
+  String? category;
   Author author;
   DateTime createdAt;
   List<EditorQuestion> questions;
@@ -91,6 +93,8 @@ class EditorKahoot {
     this.coverImageId,
     this.visibility = 'private',
     this.themeId,
+    this.status,
+    this.category,
     Author? author,
     DateTime? createdAt,
     List<EditorQuestion>? questions,
@@ -130,8 +134,8 @@ class EditorKahoot {
       description: description,
       coverImageId: coverImageId,
       visibility: visibility,
-      status: 'draft',
-      category: 'Tecnología',
+      status: status ?? 'draft',
+      category: category ?? 'Tecnología',
       themeId: themeId,
       author: author,
       createdAt: createdAt,
@@ -145,6 +149,8 @@ class EditorKahoot {
         description: k.description,
         coverImageId: k.coverImageId,
         visibility: k.visibility,
+      status: k.status,
+      category: k.category,
         themeId: k.themeId,
         author: k.author,
         createdAt: k.createdAt,
