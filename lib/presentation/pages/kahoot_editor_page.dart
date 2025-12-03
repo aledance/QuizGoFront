@@ -37,7 +37,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   @override
   void initState() {
     super.initState();
-    final mockBaseUrl = Platform.isAndroid ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+    final mockBaseUrl = Platform.isAndroid ? 'http://10.0.2.2:3000' : 'https://backcomun-production.up.railway.app';
     _service = KahootService(baseUrl: mockBaseUrl);
     _controller = KahootEditorController(service: _service, initial: EditorKahoot());
     _listener = () => setState(() {});

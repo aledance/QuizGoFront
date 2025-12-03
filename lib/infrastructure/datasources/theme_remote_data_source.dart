@@ -8,7 +8,7 @@ class ThemeRemoteDataSource {
   final String baseUrl;
 
   ThemeRemoteDataSource({required this.client, String? baseUrl})
-      : baseUrl = baseUrl ?? (Platform.isAndroid ? 'http://10.0.2.2:3000' : 'http://localhost:3000');
+      : baseUrl = baseUrl ?? (Platform.isAndroid ? 'http://10.0.2.2:3000' : 'https://backcomun-production.up.railway.app');
 
   Future<List<Map<String, dynamic>>> listThemes() async {
     final uri = Uri.parse('$baseUrl/themes');

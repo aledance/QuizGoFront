@@ -8,6 +8,8 @@ class KahootDto {
   final String description;
   final String? coverImageId;
   final String visibility;
+  final String? status;
+  final String? category;
   final String? themeId;
   final Map<String, dynamic> author;
   final String createdAt;
@@ -19,6 +21,8 @@ class KahootDto {
     required this.description,
     this.coverImageId,
     required this.visibility,
+    required this.status,
+    required this.category,
     this.themeId,
     required this.author,
     required this.createdAt,
@@ -31,6 +35,8 @@ class KahootDto {
         description: json['description'] as String? ?? '',
         coverImageId: json['coverImageId'] as String?,
         visibility: json['visibility'] as String? ?? 'private',
+        status: json['status'] as String? ?? 'draft',
+        category: json['category'] as String? ?? 'Tecnología',
         themeId: json['themeId'] as String?,
         author: (json['author'] as Map<String, dynamic>?) ?? {},
         createdAt: json['createdAt'] as String? ?? DateTime.now().toIso8601String(),
@@ -40,14 +46,16 @@ class KahootDto {
       );
 
 
-  Map<String, dynamic> toJsonRequest({required String authorId}) => {
+  Map<String, dynamic> toJsonRequest({required String authorId, required String themeId}) => {
     'authorId': authorId,
 
-    'author': {'authorId': authorId, 'name': author['name'] ?? ''},
+    //'author': {'authorId': authorId, 'name': author['name'] ?? ''},
         'title': title,
         'description': description,
         'coverImageId': coverImageId,
         'visibility': visibility,
+        'status': status,
+        'category': category,
         'themeId': themeId,
         'questions': questions.map((q) => q.toJson()).toList(),
       };
@@ -58,6 +66,8 @@ class KahootDto {
         description: description,
         coverImageId: coverImageId,
         visibility: visibility,
+        status: status,
+        category: category,
         themeId: themeId,
         author: Author(authorId: author['authorId'] as String? ?? '', name: author['name'] as String? ?? ''),
         createdAt: DateTime.parse(createdAt),
@@ -70,6 +80,8 @@ class KahootDto {
         description: k.description,
         coverImageId: k.coverImageId,
         visibility: k.visibility,
+        status: k.status,
+        category: k.category,
         themeId: k.themeId,
         author: {'authorId': k.author.authorId, 'name': k.author.name},
         createdAt: k.createdAt.toIso8601String(),

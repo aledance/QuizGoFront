@@ -7,6 +7,8 @@ class Kahoot {
   final String description;
   final String? coverImageId;
   final String visibility;
+  final String? status;
+  final String? category;
   final String? themeId;
   final Author author;
   final DateTime createdAt;
@@ -18,6 +20,8 @@ class Kahoot {
     required this.description,
     this.coverImageId,
     required this.visibility,
+    required this.status,
+    required this.category,
     this.themeId,
     required this.author,
     required this.createdAt,

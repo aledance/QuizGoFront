@@ -130,6 +130,8 @@ class EditorKahoot {
       description: description,
       coverImageId: coverImageId,
       visibility: visibility,
+      status: 'draft',
+      category: 'Tecnología',
       themeId: themeId,
       author: author,
       createdAt: createdAt,

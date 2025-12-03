@@ -9,12 +9,15 @@ class KahootRemoteDataSource {
   final String baseUrl;
 
   KahootRemoteDataSource({required this.client, String? baseUrl})
-      : baseUrl = baseUrl ?? (Platform.isAndroid ? 'http://10.0.2.2:3000' : 'http://localhost:3000');
+      : baseUrl = baseUrl ?? (Platform.isAndroid ? 'http://10.0.2.2:3000' : 'https://backcomun-production.up.railway.app');
 
   Future<KahootDto> createKahoot(KahootDto dto) async {
     final uri = Uri.parse('$baseUrl/kahoots');
-    final authorId = dto.author['authorId'] as String? ?? '';
-    final res = await client.post(uri, headers: {'Content-Type': 'application/json'}, body: jsonEncode(dto.toJsonRequest(authorId: authorId)));
+    //final authorId = dto.author['authorId'] as String? ?? ''; -> modificar cuando se tenga acceso a los ids de los autores desde el back
+    final authorId = 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4'; //pruebas
+    final themeId = 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4'; //pruebas
+    print(dto.toJsonRequest(authorId: authorId, themeId: themeId));
+    final res = await client.post(uri, headers: {'Content-Type': 'application/json'}, body: jsonEncode(dto.toJsonRequest(authorId: authorId, themeId: themeId))); //modificar luego de pruebas
     if (res.statusCode == 201) {
       return KahootDto.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
     }
@@ -24,7 +27,7 @@ class KahootRemoteDataSource {
   Future<KahootDto> updateKahoot(String kahootId, KahootDto dto) async {
     final uri = Uri.parse('$baseUrl/kahoots/$kahootId');
     final authorId = dto.author['authorId'] as String? ?? '';
-    final res = await client.put(uri, headers: {'Content-Type': 'application/json'}, body: jsonEncode(dto.toJsonRequest(authorId: authorId)));
+    final res = await client.put(uri, headers: {'Content-Type': 'application/json'}, body: jsonEncode(dto.toJsonRequest(authorId: authorId, themeId: '12345'))); //modificar luego de pruebas
     if (res.statusCode == 200) {
       return KahootDto.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
     }

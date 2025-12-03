@@ -23,6 +23,8 @@ Kahoot exampleKahoot() => Kahoot(
       visibility: 'private',
       coverImageId: null,
       themeId: null,
+      status: 'draft',
+      category: 'Tecnología',
       author: Author(authorId: '00000000-0000-0000-0000-000000000000', name: 'Tester'),
       createdAt: DateTime.now(),
       questions: [],
