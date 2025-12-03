@@ -23,6 +23,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   late VoidCallback _listener;
   late TextEditingController _titleController;
   late TextEditingController _descController;
+  late TextEditingController _categoryController;
   late TextEditingController _questionController;
   List<TextEditingController> _answerControllers = [];
   late ThemeRemoteDataSource _themesSource;
@@ -45,6 +46,8 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   });
     _titleController = TextEditingController(text: _controller.editor.title);
     _descController = TextEditingController(text: _controller.editor.description);
+    _categoryController = TextEditingController(text: _controller.editor.category ?? '');
+    _categoryController.addListener(() => _controller.setCategory(_categoryController.text.isEmpty ? null : _categoryController.text));
     _titleController.addListener(() => _controller.setTitle(_titleController.text));
     _descController.addListener(() => _controller.setDescription(_descController.text));
     _setupQuestionControllers();
@@ -57,6 +60,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
 
         _titleController.text = _controller.editor.title;
         _descController.text = _controller.editor.description;
+            _categoryController.text = _controller.editor.category ?? '';
         _setupQuestionControllers();
         setState(() {});
       }).catchError((e) {
@@ -70,6 +74,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
     _controller.removeListener(_listener);
     _titleController.dispose();
     _descController.dispose();
+    _categoryController.dispose();
     _questionController.dispose();
     for (final c in _answerControllers) {
       c.dispose();
@@ -211,8 +216,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                               const SizedBox(height: 8),
                               TextField(
                                 decoration: const InputDecoration(labelText: 'Categoría'),
-                                controller: TextEditingController(text: _controller.editor.category),
-                                onChanged: (v) => _controller.setCategory(v.isEmpty ? null : v),
+                                controller: _categoryController,
                               ),
                               const SizedBox(height: 8),
                               Row(children: [
@@ -426,7 +430,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                             TextField(decoration: const InputDecoration(labelText: 'Descripción (opcional)'), controller: _descController),
                             const SizedBox(height: 8),
                             Row(children: [
-                              Expanded(child: TextField(decoration: const InputDecoration(labelText: 'Categoría'), controller: TextEditingController(text: _controller.editor.category), onChanged: (v) => _controller.setCategory(v.isEmpty ? null : v))),
+                              Expanded(child: TextField(decoration: const InputDecoration(labelText: 'Categoría'), controller: _categoryController)),
                               const SizedBox(width: 12),
                               DropdownButton<String>(value: _controller.editor.status ?? 'draft', items: const [
                                 DropdownMenuItem(value: 'draft', child: Text('Draft')),
