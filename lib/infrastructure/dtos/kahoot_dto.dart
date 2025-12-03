@@ -7,6 +7,8 @@ class KahootDto {
   final String title;
   final String description;
   final String? coverImageId;
+  final String? category;
+  final String? status;
   final String visibility;
   final String? themeId;
   final Map<String, dynamic> author;
@@ -18,6 +20,8 @@ class KahootDto {
     required this.title,
     required this.description,
     this.coverImageId,
+    this.category,
+    this.status,
     required this.visibility,
     this.themeId,
     required this.author,
@@ -30,6 +34,8 @@ class KahootDto {
         title: json['title'] as String? ?? '',
         description: json['description'] as String? ?? '',
         coverImageId: json['coverImageId'] as String?,
+        category: json['category'] as String?,
+        status: json['status'] as String?,
         visibility: json['visibility'] as String? ?? 'private',
         themeId: json['themeId'] as String?,
         author: (json['author'] as Map<String, dynamic>?) ?? {},
@@ -47,6 +53,8 @@ class KahootDto {
         'title': title,
         'description': description,
         'coverImageId': coverImageId,
+        'category': category,
+        'status': status,
         'visibility': visibility,
         'themeId': themeId,
         'questions': questions.map((q) => q.toJson()).toList(),
@@ -57,6 +65,8 @@ class KahootDto {
         title: title,
         description: description,
         coverImageId: coverImageId,
+      category: category,
+      status: status,
         visibility: visibility,
         themeId: themeId,
         author: Author(authorId: author['authorId'] as String? ?? '', name: author['name'] as String? ?? ''),
@@ -69,7 +79,9 @@ class KahootDto {
         title: k.title,
         description: k.description,
         coverImageId: k.coverImageId,
-        visibility: k.visibility,
+        category: k.category,
+        status: k.status,
+      visibility: k.visibility,
         themeId: k.themeId,
         author: {'authorId': k.author.authorId, 'name': k.author.name},
         createdAt: k.createdAt.toIso8601String(),

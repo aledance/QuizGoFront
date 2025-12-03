@@ -78,6 +78,8 @@ class EditorKahoot {
   String title;
   String description;
   String? coverImageId;
+  String? category;
+  String? status;
   String visibility;
   String? themeId;
   Author author;
@@ -89,6 +91,8 @@ class EditorKahoot {
     this.title = '',
     this.description = '',
     this.coverImageId,
+    this.category,
+    this.status,
     this.visibility = 'private',
     this.themeId,
     Author? author,
@@ -129,6 +133,8 @@ class EditorKahoot {
       title: title,
       description: description,
       coverImageId: coverImageId,
+      category: category,
+      status: status,
       visibility: visibility,
       themeId: themeId,
       author: author,
@@ -137,11 +143,13 @@ class EditorKahoot {
     );
   }
 
-  factory EditorKahoot.fromEntity(ent_kahoot.Kahoot k) => EditorKahoot(
+    factory EditorKahoot.fromEntity(ent_kahoot.Kahoot k) => EditorKahoot(
         id: k.id,
         title: k.title,
         description: k.description,
         coverImageId: k.coverImageId,
+      category: k.category,
+      status: k.status,
         visibility: k.visibility,
         themeId: k.themeId,
         author: k.author,

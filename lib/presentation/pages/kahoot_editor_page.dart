@@ -208,6 +208,26 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                 decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
                                 controller: _descController,
                               ),
+                              const SizedBox(height: 8),
+                              TextField(
+                                decoration: const InputDecoration(labelText: 'Categoría'),
+                                controller: TextEditingController(text: _controller.editor.category),
+                                onChanged: (v) => _controller.setCategory(v.isEmpty ? null : v),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(children: [
+                                const Text('Estado: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(width: 8),
+                                DropdownButton<String>(
+                                  value: _controller.editor.status ?? 'draft',
+                                  items: const [
+                                    DropdownMenuItem(value: 'draft', child: Text('Draft')),
+                                    DropdownMenuItem(value: 'published', child: Text('Published')),
+                                    DropdownMenuItem(value: 'archived', child: Text('Archived')),
+                                  ],
+                                  onChanged: (v) => _controller.setStatus(v),
+                                )
+                              ]),
                             ],
                           ),
                         ),
@@ -404,6 +424,16 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                             TextField(decoration: const InputDecoration(labelText: 'Título del Quiz'), controller: _titleController),
                             const SizedBox(height: 8),
                             TextField(decoration: const InputDecoration(labelText: 'Descripción (opcional)'), controller: _descController),
+                            const SizedBox(height: 8),
+                            Row(children: [
+                              Expanded(child: TextField(decoration: const InputDecoration(labelText: 'Categoría'), controller: TextEditingController(text: _controller.editor.category), onChanged: (v) => _controller.setCategory(v.isEmpty ? null : v))),
+                              const SizedBox(width: 12),
+                              DropdownButton<String>(value: _controller.editor.status ?? 'draft', items: const [
+                                DropdownMenuItem(value: 'draft', child: Text('Draft')),
+                                DropdownMenuItem(value: 'published', child: Text('Published')),
+                                DropdownMenuItem(value: 'archived', child: Text('Archived')),
+                              ], onChanged: (v) => _controller.setStatus(v)),
+                            ]),
                           ]),
                         ),
                         const SizedBox(width: 20),

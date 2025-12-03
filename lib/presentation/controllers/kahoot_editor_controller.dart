@@ -85,6 +85,16 @@ class KahootEditorController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCategory(String? category) {
+    editor.category = category;
+    notifyListeners();
+  }
+
+  void setStatus(String? status) {
+    editor.status = status;
+    notifyListeners();
+  }
+
   void setVisibility(String v) {
     editor.visibility = v;
     notifyListeners();
@@ -135,6 +145,8 @@ class KahootEditorController extends ChangeNotifier {
     editor.title = e.title;
     editor.description = e.description;
     editor.coverImageId = e.coverImageId;
+    editor.category = e.category;
+    editor.status = e.status;
     editor.visibility = e.visibility;
     editor.themeId = e.themeId;
     editor.author = e.author;

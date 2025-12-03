@@ -59,4 +59,22 @@ flutter {
 }
 
 dependencies {
+    // Explicit Kotlin stdlib to ensure Kotlin symbols resolve during compilation.
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    // Provide AndroidX annotation at compile time for GeneratedPluginRegistrant annotations
+    implementation 'androidx.annotation:annotation:1.6.0'
+    // Provide AndroidX lifecycle at compile time to satisfy LifecycleOwner references
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.6.1'
+
+    // Include Flutter engine JAR from local Flutter SDK so Java compilation can resolve
+    // `io.flutter.*` classes (uses flutter.sdk from local.properties loaded above).
+    def flutterSdk = localProperties.getProperty('flutter.sdk')
+    if (flutterSdk != null) {
+        // Keep the local Flutter engine JAR available for compilation, but do not
+        // package it into the APK to avoid duplicate classes with AAR artifacts
+        // (e.g. `flutter_embedding_debug`). Using `compileOnly` ensures the
+        // classes are available at compile time but not included in the final
+        // runtime classpath.
+        compileOnly files("${flutterSdk}/bin/cache/artifacts/engine/android-arm64/flutter.jar")
+    }
 }

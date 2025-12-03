@@ -1,4 +1,8 @@
 buildscript {
+    // Kotlin Gradle Plugin (KGP) version. Bump to a newer release to match
+    // the Kotlin plugin declared in `settings.gradle.kts` and avoid the
+    // deprecation warning. Update this value when newer supported KGP
+    // versions are required by Flutter.
     ext.kotlin_version = '2.1.0'
     repositories {
         google()

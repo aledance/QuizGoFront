@@ -6,6 +6,8 @@ class Kahoot {
   final String title;
   final String description;
   final String? coverImageId;
+  final String? category;
+  final String? status;
   final String visibility;
   final String? themeId;
   final Author author;
@@ -17,6 +19,8 @@ class Kahoot {
     required this.title,
     required this.description,
     this.coverImageId,
+    this.category,
+    this.status,
     required this.visibility,
     this.themeId,
     required this.author,
