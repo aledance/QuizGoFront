@@ -37,10 +37,10 @@ class QuestionDto {
 
 
   Map<String, dynamic> toJson() => {
-        if (id != null) 'id': id,
-        if (quizId != null) 'quizId': quizId,
+        if (id != null && id!.isNotEmpty) 'id': id,
+        if (quizId != null && quizId!.isNotEmpty) 'quizId': quizId,
         'questionText': text,
-      'mediaId': mediaId,
+        'mediaId': mediaId,
 
         'questionType': type,
         'timeLimit': timeLimit,

@@ -180,13 +180,19 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                                     // If themes list is empty but there's a selected themeId, show it as a Chip
                                                     if (themes.isEmpty) {
                                                       if (_controller.editor.themeId != null && _controller.editor.themeId!.isNotEmpty) {
-                                                        return Padding(padding: const EdgeInsets.only(bottom: 8.0), child: Chip(label: Text('Tema: ${_controller.editor.themeId}')));
+                                                        String label = _controller.editor.themeId!;
+                                                        // Hide raw UUID for the fallback theme
+                                                        if (label == 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4') label = 'Estándar';
+                                                        return Padding(padding: const EdgeInsets.only(bottom: 8.0), child: Chip(label: Text('Tema: $label')));
                                                       }
                                                       return const SizedBox.shrink();
                                                     }
                                                     // Find selected theme label if available
                                                     final selectedTheme = themes.firstWhere((t) => (t['id'] ?? '').toString() == (_controller.editor.themeId ?? ''), orElse: () => {});
-                                                    final selectedLabel = selectedTheme.isNotEmpty ? (selectedTheme['name'] ?? selectedTheme['id'] ?? '').toString() : null;
+                                                    String? selectedLabel = selectedTheme.isNotEmpty ? (selectedTheme['name'] ?? selectedTheme['id'] ?? '').toString() : null;
+                                                    if (selectedLabel == null && _controller.editor.themeId == 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4') {
+                                                      selectedLabel = 'Estándar';
+                                                    }
                                                     return Padding(
                                                       padding: const EdgeInsets.only(bottom: 8.0),
                                                       child: Row(children: [
@@ -197,6 +203,9 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                                           hint: Text(selectedLabel ?? 'Seleccionar tema'),
                                                           items: [
                                                             const DropdownMenuItem<String>(value: '', child: Text('Sin tema')),
+                                                            // Ensure fallback option is available if not in list
+                                                            if (!themes.any((t) => t['id'] == 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4'))
+                                                              const DropdownMenuItem<String>(value: 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4', child: Text('Estándar')),
                                                             ...themes.map((t) {
                                                               final id = (t['id'] ?? '').toString();
                                                               final label = (t['name'] ?? t['id'] ?? '').toString();

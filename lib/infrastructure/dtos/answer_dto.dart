@@ -18,8 +18,8 @@ class AnswerDto {
       );
 
   Map<String, dynamic> toJson() => {
-        if (id != null) 'id': id,
-        if (questionId != null) 'questionId': questionId,
+        if (id != null && id!.isNotEmpty) 'id': id,
+        if (questionId != null && questionId!.isNotEmpty) 'questionId': questionId,
 
         // Always include answerText and mediaId keys (value may be null)
         'answerText': text,

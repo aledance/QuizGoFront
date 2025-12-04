@@ -12,6 +12,7 @@ class KahootEditorController extends ChangeNotifier {
   final KahootService _service;
   final EditorKahoot editor;
   static const String _fallbackAuthorId = 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4';
+  static const String _fallbackThemeId = 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4';
 
   int selectedQuestionIndex = 0;
 
@@ -159,15 +160,22 @@ class KahootEditorController extends ChangeNotifier {
     if (themeId != null) {
       final uuidV4 = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$');
       if (!uuidV4.hasMatch(themeId)) {
-        // Invalid themeId -> drop it to avoid server validation error
+        // Invalid themeId -> drop it
         editor.themeId = null;
       }
+    }
+    
+    // If themeId is missing, use fallback to satisfy backend requirement
+    if (editor.themeId == null) {
+      editor.themeId = _fallbackThemeId;
     }
 
     // Normalize question and answer fields: convert empty strings to null for optional fields
     for (var q in editor.questions) {
+      if (q.id != null && q.id!.trim().isEmpty) q.id = null;
       if (q.mediaId != null && q.mediaId!.trim().isEmpty) q.mediaId = null;
       for (var a in q.answers) {
+        if (a.id != null && a.id!.trim().isEmpty) a.id = null;
         if (a.mediaId != null && a.mediaId!.trim().isEmpty) a.mediaId = null;
         if (a.text != null && a.text!.trim().isEmpty) a.text = null;
       }
