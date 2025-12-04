@@ -239,33 +239,36 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                 enabled: !_isSaving,
                               ),
                               const SizedBox(height: 8),
-                              Row(children: [
-                                const Text('Estado: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                const SizedBox(width: 8),
-                                DropdownButton<String>(
-                                  value: _controller.editor.status ?? 'draft',
-                                  items: const [
-                                    DropdownMenuItem(value: 'draft', child: Text('Borrador')),
-                                    DropdownMenuItem(value: 'published', child: Text('Publicado')),
-                                    DropdownMenuItem(value: 'archived', child: Text('Archivado')),
-                                  ],
-                                  onChanged: (v) => _controller.setStatus(v),
-                                ),
-                                const SizedBox(width: 16),
-                                const Text('Visibilidad: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                const SizedBox(width: 8),
-                                DropdownButton<String>(
-                                  value: _controller.editor.visibility,
-                                  items: const [
-                                    DropdownMenuItem(value: 'private', child: Text('Privado')),
-                                    DropdownMenuItem(value: 'public', child: Text('Público')),
-                                    DropdownMenuItem(value: 'unlisted', child: Text('No listado')),
-                                  ],
-                                  onChanged: (v) {
-                                    if (v != null) _controller.setVisibility(v);
-                                  },
-                                )
-                              ]),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(children: [
+                                  const Text('Estado: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  const SizedBox(width: 8),
+                                  DropdownButton<String>(
+                                    value: _controller.editor.status ?? 'draft',
+                                    items: const [
+                                      DropdownMenuItem(value: 'draft', child: Text('Borrador')),
+                                      DropdownMenuItem(value: 'published', child: Text('Publicado')),
+                                      DropdownMenuItem(value: 'archived', child: Text('Archivado')),
+                                    ],
+                                    onChanged: (v) => _controller.setStatus(v),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  const Text('Visibilidad: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  const SizedBox(width: 8),
+                                  DropdownButton<String>(
+                                    value: _controller.editor.visibility,
+                                    items: const [
+                                      DropdownMenuItem(value: 'private', child: Text('Privado')),
+                                      DropdownMenuItem(value: 'public', child: Text('Público')),
+                                      DropdownMenuItem(value: 'unlisted', child: Text('No listado')),
+                                    ],
+                                    onChanged: (v) {
+                                      if (v != null) _controller.setVisibility(v);
+                                    },
+                                  )
+                                ]),
+                              ),
                             ],
                           ),
                         ),
@@ -509,26 +512,29 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                 final selectedLabel = selectedTheme.isNotEmpty ? (selectedTheme['name'] ?? selectedTheme['id'] ?? '').toString() : null;
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: Row(children: [
-                                    const Text('Tema: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                    const SizedBox(width: 8),
-                                    DropdownButton<String>(
-                                      value: (_controller.editor.themeId == null || _controller.editor.themeId == '') ? null : _controller.editor.themeId,
-                                      hint: Text(selectedLabel ?? 'Seleccionar tema'),
-                                      items: [
-                                        const DropdownMenuItem<String>(value: '', child: Text('Sin tema')),
-                                        ...themes.map((t) {
-                                          final id = (t['id'] ?? '').toString();
-                                          final label = (t['name'] ?? t['id'] ?? '').toString();
-                                          return DropdownMenuItem<String>(value: id, child: Text(label));
-                                        }).toList(),
-                                      ],
-                                      onChanged: (v) {
-                                        final val = (v != null && v.isEmpty) ? null : v;
-                                        _controller.setThemeId(val);
-                                      },
-                                    ),
-                                  ]),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(children: [
+                                      const Text('Tema: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      const SizedBox(width: 8),
+                                      DropdownButton<String>(
+                                        value: (_controller.editor.themeId == null || _controller.editor.themeId == '') ? null : _controller.editor.themeId,
+                                        hint: Text(selectedLabel ?? 'Seleccionar tema'),
+                                        items: [
+                                          const DropdownMenuItem<String>(value: '', child: Text('Sin tema')),
+                                          ...themes.map((t) {
+                                            final id = (t['id'] ?? '').toString();
+                                            final label = (t['name'] ?? t['id'] ?? '').toString();
+                                            return DropdownMenuItem<String>(value: id, child: Text(label));
+                                          }).toList(),
+                                        ],
+                                        onChanged: (v) {
+                                          final val = (v != null && v.isEmpty) ? null : v;
+                                          _controller.setThemeId(val);
+                                        },
+                                      ),
+                                    ]),
+                                  ),
                                 );
                               },
                             ),
@@ -536,21 +542,28 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                             const SizedBox(height: 8),
                             TextField(decoration: const InputDecoration(labelText: 'Descripción (opcional)'), controller: _descController, enabled: !_isSaving),
                             const SizedBox(height: 8),
-                            Row(children: [
-                              Expanded(child: TextField(decoration: const InputDecoration(labelText: 'Categoría'), controller: _categoryController, enabled: !_isSaving)),
-                              const SizedBox(width: 12),
-                              DropdownButton<String>(value: _controller.editor.status ?? 'draft', items: const [
-                                DropdownMenuItem(value: 'draft', child: Text('Borrador')),
-                                DropdownMenuItem(value: 'published', child: Text('Publicado')),
-                                DropdownMenuItem(value: 'archived', child: Text('Archivado')),
-                              ], onChanged: (v) => _controller.setStatus(v)),
-                              const SizedBox(width: 12),
-                              DropdownButton<String>(value: _controller.editor.visibility, items: const [
-                                DropdownMenuItem(value: 'private', child: Text('Privado')),
-                                DropdownMenuItem(value: 'public', child: Text('Público')),
-                                DropdownMenuItem(value: 'unlisted', child: Text('No listado')),
-                              ], onChanged: (v) { if (v != null) _controller.setVisibility(v); }),
-                            ]),
+                            TextField(decoration: const InputDecoration(labelText: 'Categoría'), controller: _categoryController, enabled: !_isSaving),
+                            const SizedBox(height: 8),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(children: [
+                                const Text('Estado: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(width: 8),
+                                DropdownButton<String>(value: _controller.editor.status ?? 'draft', items: const [
+                                  DropdownMenuItem(value: 'draft', child: Text('Borrador')),
+                                  DropdownMenuItem(value: 'published', child: Text('Publicado')),
+                                  DropdownMenuItem(value: 'archived', child: Text('Archivado')),
+                                ], onChanged: (v) => _controller.setStatus(v)),
+                                const SizedBox(width: 16),
+                                const Text('Visibilidad: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(width: 8),
+                                DropdownButton<String>(value: _controller.editor.visibility, items: const [
+                                  DropdownMenuItem(value: 'private', child: Text('Privado')),
+                                  DropdownMenuItem(value: 'public', child: Text('Público')),
+                                  DropdownMenuItem(value: 'unlisted', child: Text('No listado')),
+                                ], onChanged: (v) { if (v != null) _controller.setVisibility(v); }),
+                              ]),
+                            ),
                           ]),
                         ),
                         const SizedBox(width: 20),
@@ -568,33 +581,36 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text('Pregunta ${_controller.selectedQuestionIndex + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                DropdownButton<QuestionType>(
-                                  value: _controller.selectedQuestion.type,
-                                  items: const [
-                                    DropdownMenuItem(value: QuestionType.quiz, child: Text('Quiz')),
-                                    DropdownMenuItem(value: QuestionType.trueFalse, child: Text('Verdadero/Falso')),
-                                  ],
-                                  onChanged: (v) { if (v != null) _controller.setQuestionType(v); },
-                                ),
-                                const SizedBox(width: 12),
-                                DropdownButton<int>(
-                                  value: _controller.selectedQuestion.timeLimit,
-                                  items: [5, 10, 20, 30, 60, 90, 120, 240].map((t) => DropdownMenuItem(value: t, child: Text('${t}s'))).toList(),
-                                  onChanged: (v) { if (v != null) _controller.setQuestionTimeLimit(v); },
-                                ),
-                                const SizedBox(width: 12),
-                                DropdownButton<int>(
-                                  value: _controller.selectedQuestion.points,
-                                  items: const [
-                                    DropdownMenuItem(value: 0, child: Text('0 pts')),
-                                    DropdownMenuItem(value: 1000, child: Text('1000 pts')),
-                                    DropdownMenuItem(value: 2000, child: Text('2000 pts')),
-                                  ],
-                                  onChanged: (v) { if (v != null) _controller.setQuestionPoints(v); },
-                                ),
-                              ],
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  DropdownButton<QuestionType>(
+                                    value: _controller.selectedQuestion.type,
+                                    items: const [
+                                      DropdownMenuItem(value: QuestionType.quiz, child: Text('Quiz')),
+                                      DropdownMenuItem(value: QuestionType.trueFalse, child: Text('Verdadero/Falso')),
+                                    ],
+                                    onChanged: (v) { if (v != null) _controller.setQuestionType(v); },
+                                  ),
+                                  const SizedBox(width: 12),
+                                  DropdownButton<int>(
+                                    value: _controller.selectedQuestion.timeLimit,
+                                    items: [5, 10, 20, 30, 60, 90, 120, 240].map((t) => DropdownMenuItem(value: t, child: Text('${t}s'))).toList(),
+                                    onChanged: (v) { if (v != null) _controller.setQuestionTimeLimit(v); },
+                                  ),
+                                  const SizedBox(width: 12),
+                                  DropdownButton<int>(
+                                    value: _controller.selectedQuestion.points,
+                                    items: const [
+                                      DropdownMenuItem(value: 0, child: Text('0 pts')),
+                                      DropdownMenuItem(value: 1000, child: Text('1000 pts')),
+                                      DropdownMenuItem(value: 2000, child: Text('2000 pts')),
+                                    ],
+                                    onChanged: (v) { if (v != null) _controller.setQuestionPoints(v); },
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 8),
                             TextField(decoration: const InputDecoration(labelText: 'Enunciado'), controller: _questionController),

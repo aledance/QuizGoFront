@@ -71,24 +71,26 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Hola, Team Morado',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Hola, Team Morado',
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ],
+                ),
               ),
-              const Spacer(),
               FilledButton(
                 onPressed: () {},
-                style: FilledButton.styleFrom(backgroundColor: const Color(0xFF00A88C), padding: const EdgeInsets.symmetric(horizontal: 20)),
+                style: FilledButton.styleFrom(backgroundColor: const Color(0xFF00A88C), padding: const EdgeInsets.symmetric(horizontal: 12)),
                 child: const Text('Actualizar'),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               IconButton(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsPage()));
