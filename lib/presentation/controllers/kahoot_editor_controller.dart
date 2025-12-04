@@ -165,6 +165,10 @@ class KahootEditorController extends ChangeNotifier {
     return updated;
   }
 
+  Future<void> deleteKahoot(String id) async {
+    await _service.delete(id);
+  }
+
   void _normalizeBeforeSend() {
     // Ensure authorId is present
     if (editor.author.authorId.isEmpty) {

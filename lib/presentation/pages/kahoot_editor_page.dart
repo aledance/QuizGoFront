@@ -137,6 +137,45 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         actions: [
+          if (_controller.editor.id != null && _controller.editor.id!.isNotEmpty)
+            IconButton(
+              tooltip: 'Eliminar Kahoot',
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Eliminar Kahoot'),
+                    content: const Text('¿Estás seguro de que quieres eliminar este Kahoot? Esta acción no se puede deshacer.'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(true),
+                        style: TextButton.styleFrom(foregroundColor: Colors.red),
+                        child: const Text('Eliminar'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  setState(() { _isSaving = true; });
+                  try {
+                    await _controller.deleteKahoot(_controller.editor.id!);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kahoot eliminado correctamente')));
+                      Navigator.of(context).pop(); // Go back to previous screen
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al eliminar: $e')));
+                    }
+                  } finally {
+                    if (mounted) setState(() { _isSaving = false; });
+                  }
+                }
+              },
+            ),
           IconButton(
             tooltip: 'Admin',
             icon: const Icon(Icons.admin_panel_settings),
