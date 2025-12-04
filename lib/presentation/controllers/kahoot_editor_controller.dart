@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../../application/editor/kahoot_editor.dart';
 import '../../domain/entities/question.dart' as ent_question;
 import '../../domain/entities/kahoot.dart' as ent_kahoot;
+import '../../domain/entities/author.dart';
 import '../services/kahoot_service.dart';
 
 
@@ -10,6 +11,7 @@ import '../services/kahoot_service.dart';
 class KahootEditorController extends ChangeNotifier {
   final KahootService _service;
   final EditorKahoot editor;
+  static const String _fallbackAuthorId = 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4';
 
   int selectedQuestionIndex = 0;
 
@@ -127,15 +129,43 @@ class KahootEditorController extends ChangeNotifier {
 
 
   Future<ent_kahoot.Kahoot> createKahoot() async {
+    _normalizeBeforeSend();
     final entity = editor.toEntity();
     final created = await _service.create(entity);
     return created;
   }
 
   Future<ent_kahoot.Kahoot> updateKahoot(String id) async {
+    _normalizeBeforeSend();
     final entity = editor.toEntity(kahootId: id);
     final updated = await _service.update(id, entity);
     return updated;
+  }
+
+  void _normalizeBeforeSend() {
+    // Ensure authorId is present
+    if (editor.author.authorId.isEmpty) {
+      editor.author = Author(authorId: _fallbackAuthorId, name: editor.author.name);
+    }
+
+    // Validate themeId: backend expects a UUID v4 or null
+    final themeId = editor.themeId;
+    if (themeId != null && themeId.isNotEmpty) {
+      final uuidV4 = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$');
+      if (!uuidV4.hasMatch(themeId)) {
+        // Invalid themeId -> drop it to avoid server validation error
+        editor.themeId = null;
+      }
+    }
+
+    // Normalize question and answer fields: convert empty strings to null for optional fields
+    for (var q in editor.questions) {
+      if (q.mediaId != null && q.mediaId!.isEmpty) q.mediaId = null;
+      for (var a in q.answers) {
+        if (a.mediaId != null && a.mediaId!.isEmpty) a.mediaId = null;
+        if (a.text != null && a.text!.isEmpty) a.text = null;
+      }
+    }
   }
 
   Future<void> loadKahoot(String id) async {

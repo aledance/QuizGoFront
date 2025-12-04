@@ -28,6 +28,7 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
   List<TextEditingController> _answerControllers = [];
   late ThemeRemoteDataSource _themesSource;
   late Future<List<Map<String, dynamic>>> _themesFuture;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -109,7 +110,9 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
       final idx = i;
       _answerControllers[i].addListener(() {
         final val = _answerControllers[idx].text;
-        if (idx < _controller.selectedQuestion.answers.length) _controller.selectedQuestion.answers[idx].text = val;
+        if (idx < _controller.selectedQuestion.answers.length) {
+          _controller.selectedQuestion.answers[idx].text = val.isEmpty ? null : val;
+        }
       });
     }
   }
@@ -172,13 +175,17 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                                 FutureBuilder<List<Map<String, dynamic>>>(
                                                   future: _themesFuture,
                                                   builder: (ctx, snap) {
-                                                    if (snap.connectionState == ConnectionState.waiting) {
+                                                    final themes = snap.data ?? [];
+                                                    // If themes list is empty but there's a selected themeId, show it as a Chip
+                                                    if (themes.isEmpty) {
                                                       if (_controller.editor.themeId != null && _controller.editor.themeId!.isNotEmpty) {
                                                         return Padding(padding: const EdgeInsets.only(bottom: 8.0), child: Chip(label: Text('Tema: ${_controller.editor.themeId}')));
                                                       }
                                                       return const SizedBox.shrink();
                                                     }
-                                                    final themes = snap.data ?? [];
+                                                    // Find selected theme label if available
+                                                    final selectedTheme = themes.firstWhere((t) => (t['id'] ?? '').toString() == (_controller.editor.themeId ?? ''), orElse: () => {});
+                                                    final selectedLabel = selectedTheme.isNotEmpty ? (selectedTheme['name'] ?? selectedTheme['id'] ?? '').toString() : null;
                                                     return Padding(
                                                       padding: const EdgeInsets.only(bottom: 8.0),
                                                       child: Row(children: [
@@ -186,13 +193,13 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                                         const SizedBox(width: 8),
                                                         DropdownButton<String>(
                                                           value: (_controller.editor.themeId == null || _controller.editor.themeId == '') ? null : _controller.editor.themeId,
-                                                          hint: const Text('Seleccionar tema'),
+                                                          hint: Text(selectedLabel ?? 'Seleccionar tema'),
                                                           items: [
                                                             const DropdownMenuItem<String>(value: '', child: Text('Sin tema')),
                                                             ...themes.map((t) {
-                                                              final v = (t['name'] ?? t['id'] ?? '').toString();
+                                                              final id = (t['id'] ?? '').toString();
                                                               final label = (t['name'] ?? t['id'] ?? '').toString();
-                                                              return DropdownMenuItem<String>(value: v, child: Text(label));
+                                                              return DropdownMenuItem<String>(value: id, child: Text(label));
                                                             }).toList(),
                                                           ],
                                                           onChanged: (v) {
@@ -207,16 +214,19 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                               TextField(
                                 decoration: const InputDecoration(labelText: 'Título del Quiz'),
                                 controller: _titleController,
+                                enabled: !_isSaving,
                               ),
                               const SizedBox(height: 6),
                               TextField(
                                 decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
                                 controller: _descController,
+                                enabled: !_isSaving,
                               ),
                               const SizedBox(height: 8),
                               TextField(
                                 decoration: const InputDecoration(labelText: 'Categoría'),
                                 controller: _categoryController,
+                                enabled: !_isSaving,
                               ),
                               const SizedBox(height: 8),
                               Row(children: [
@@ -349,12 +359,13 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 TextButton.icon(onPressed: () { _controller.addAnswerToSelected(); _setupQuestionControllers(); }, icon: const Icon(Icons.add_circle_outline), label: const Text('Añadir respuesta')),
-                                ElevatedButton(onPressed: () async {
+                                ElevatedButton(onPressed: _isSaving ? null : () async {
                                   final errors = _controller.validate();
                                   if (errors.isNotEmpty) {
                                     showMessage(errors.join('\n'));
                                     return;
                                   }
+                                  setState(() { _isSaving = true; });
                                   try {
                                     if (_controller.editor.id != null && _controller.editor.id!.isNotEmpty) {
                                       final updated = await _controller.updateKahoot(_controller.editor.id!);
@@ -366,9 +377,12 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                       await _controller.loadKahoot(created.id ?? '');
                                     }
                                   } catch (e) {
-                                    showMessage('Error: $e');
+                                    final msg = e.toString();
+                                    showMessage('Error: ${msg.length > 200 ? msg.substring(0,200) + "..." : msg}');
+                                  } finally {
+                                    if (mounted) setState(() { _isSaving = false; });
                                   }
-                                }, child: const Text('Guardar'))
+                                }, child: _isSaving ? const SizedBox(width:16, height:16, child: CircularProgressIndicator(strokeWidth:2)) : const Text('Guardar'))
                               ],
                             )
                           ],
@@ -425,12 +439,49 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                         const SizedBox(width: 20),
                         Expanded(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            TextField(decoration: const InputDecoration(labelText: 'Título del Quiz'), controller: _titleController),
+                            FutureBuilder<List<Map<String, dynamic>>>(
+                              future: _themesFuture,
+                              builder: (ctx, snap) {
+                                final themes = snap.data ?? [];
+                                if (themes.isEmpty) {
+                                  if (_controller.editor.themeId != null && _controller.editor.themeId!.isNotEmpty) {
+                                    return Padding(padding: const EdgeInsets.only(bottom: 8.0), child: Chip(label: Text('Tema: ${_controller.editor.themeId}')));
+                                  }
+                                  return const SizedBox.shrink();
+                                }
+                                final selectedTheme = themes.firstWhere((t) => (t['id'] ?? '').toString() == (_controller.editor.themeId ?? ''), orElse: () => {});
+                                final selectedLabel = selectedTheme.isNotEmpty ? (selectedTheme['name'] ?? selectedTheme['id'] ?? '').toString() : null;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: Row(children: [
+                                    const Text('Tema: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    const SizedBox(width: 8),
+                                    DropdownButton<String>(
+                                      value: (_controller.editor.themeId == null || _controller.editor.themeId == '') ? null : _controller.editor.themeId,
+                                      hint: Text(selectedLabel ?? 'Seleccionar tema'),
+                                      items: [
+                                        const DropdownMenuItem<String>(value: '', child: Text('Sin tema')),
+                                        ...themes.map((t) {
+                                          final id = (t['id'] ?? '').toString();
+                                          final label = (t['name'] ?? t['id'] ?? '').toString();
+                                          return DropdownMenuItem<String>(value: id, child: Text(label));
+                                        }).toList(),
+                                      ],
+                                      onChanged: (v) {
+                                        final val = (v != null && v.isEmpty) ? null : v;
+                                        _controller.setThemeId(val);
+                                      },
+                                    ),
+                                  ]),
+                                );
+                              },
+                            ),
+                            TextField(decoration: const InputDecoration(labelText: 'Título del Quiz'), controller: _titleController, enabled: !_isSaving),
                             const SizedBox(height: 8),
-                            TextField(decoration: const InputDecoration(labelText: 'Descripción (opcional)'), controller: _descController),
+                            TextField(decoration: const InputDecoration(labelText: 'Descripción (opcional)'), controller: _descController, enabled: !_isSaving),
                             const SizedBox(height: 8),
                             Row(children: [
-                              Expanded(child: TextField(decoration: const InputDecoration(labelText: 'Categoría'), controller: _categoryController)),
+                              Expanded(child: TextField(decoration: const InputDecoration(labelText: 'Categoría'), controller: _categoryController, enabled: !_isSaving)),
                               const SizedBox(width: 12),
                               DropdownButton<String>(value: _controller.editor.status ?? 'draft', items: const [
                                 DropdownMenuItem(value: 'draft', child: Text('Draft')),
@@ -478,12 +529,13 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                             const SizedBox(height: 8),
                             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                               TextButton.icon(onPressed: () { _controller.addAnswerToSelected(); _setupQuestionControllers(); }, icon: const Icon(Icons.add_circle_outline), label: const Text('Añadir respuesta')),
-                              ElevatedButton(onPressed: () async {
+                              ElevatedButton(onPressed: _isSaving ? null : () async {
                                 final errors = _controller.validate();
                                 if (errors.isNotEmpty) {
                                   showMessage(errors.join('\n'));
                                   return;
                                 }
+                                setState(() { _isSaving = true; });
                                 try {
                                   if (_controller.editor.id != null && _controller.editor.id!.isNotEmpty) {
                                     final updated = await _controller.updateKahoot(_controller.editor.id!);
@@ -495,9 +547,12 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                                     await _controller.loadKahoot(created.id ?? '');
                                   }
                                 } catch (e) {
-                                  showMessage('Error: $e');
+                                  final msg = e.toString();
+                                  showMessage('Error: ${msg.length > 200 ? msg.substring(0,200) + "..." : msg}');
+                                } finally {
+                                  if (mounted) setState(() { _isSaving = false; });
                                 }
-                              }, child: const Text('Guardar'))
+                              }, child: _isSaving ? const SizedBox(width:16, height:16, child: CircularProgressIndicator(strokeWidth:2)) : const Text('Guardar'))
                             ])
                           ]),
                         ),

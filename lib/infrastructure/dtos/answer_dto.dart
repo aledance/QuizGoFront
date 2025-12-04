@@ -21,6 +21,7 @@ class AnswerDto {
         if (id != null) 'id': id,
         if (questionId != null) 'questionId': questionId,
 
+        // Always include answerText and mediaId keys (value may be null)
         'answerText': text,
         'mediaId': mediaId,
         'isCorrect': isCorrect,
