@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../application/editor/kahoot_editor.dart';
 import '../../domain/entities/question.dart' as ent_question;
 import '../../domain/entities/kahoot.dart' as ent_kahoot;
@@ -13,6 +14,9 @@ class KahootEditorController extends ChangeNotifier {
   final EditorKahoot editor;
   static const String _fallbackAuthorId = 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4';
   static const String _fallbackThemeId = 'f1986c62-7dc1-47c5-9a1f-03d34043e8f4';
+
+  XFile? _pickedImage;
+  XFile? get pickedImage => _pickedImage;
 
   int selectedQuestionIndex = 0;
 
@@ -86,6 +90,24 @@ class KahootEditorController extends ChangeNotifier {
   void setCoverImageId(String? id) {
     editor.coverImageId = id;
     notifyListeners();
+  }
+
+  Future<void> pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    try {
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        _pickedImage = image;
+        notifyListeners();
+        // TODO: Implement upload logic here when endpoint is available
+        // final uploadedId = await _service.uploadImage(File(image.path));
+        // setCoverImageId(uploadedId);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error picking image: $e');
+      }
+    }
   }
 
   void setCategory(String? category) {

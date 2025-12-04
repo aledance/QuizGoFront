@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/presentation/admin/pages/admin_dashboard_page.dart';
 import '../controllers/kahoot_editor_controller.dart';
@@ -157,12 +158,20 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                     Row(
                       children: [
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () => _controller.pickImage(),
                           child: Container(
                             width: 72,
                             height: 72,
-                            decoration: BoxDecoration(color: placeholderColor, borderRadius: BorderRadius.circular(8)),
-                            child: Icon(Icons.photo_camera, size: 28, color: placeholderIconColor),
+                            decoration: BoxDecoration(
+                              color: placeholderColor,
+                              borderRadius: BorderRadius.circular(8),
+                              image: _controller.pickedImage != null
+                                  ? DecorationImage(image: FileImage(File(_controller.pickedImage!.path)), fit: BoxFit.cover)
+                                  : null,
+                            ),
+                            child: _controller.pickedImage == null
+                                ? Icon(Icons.photo_camera, size: 28, color: placeholderIconColor)
+                                : null,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -492,8 +501,21 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         GestureDetector(
-                          onTap: () {},
-                          child: Container(width: 96, height: 96, decoration: BoxDecoration(color: placeholderColor, borderRadius: BorderRadius.circular(8)), child: Icon(Icons.photo_camera, size: 32, color: placeholderIconColor)),
+                          onTap: () => _controller.pickImage(),
+                          child: Container(
+                            width: 96,
+                            height: 96,
+                            decoration: BoxDecoration(
+                              color: placeholderColor,
+                              borderRadius: BorderRadius.circular(8),
+                              image: _controller.pickedImage != null
+                                  ? DecorationImage(image: FileImage(File(_controller.pickedImage!.path)), fit: BoxFit.cover)
+                                  : null,
+                            ),
+                            child: _controller.pickedImage == null
+                                ? Icon(Icons.photo_camera, size: 32, color: placeholderIconColor)
+                                : null,
+                          ),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
