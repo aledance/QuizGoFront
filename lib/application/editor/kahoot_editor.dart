@@ -49,7 +49,7 @@ class EditorQuestion {
     this.timeLimit = 20,
     this.points = 1000,
     List<EditorAnswer>? answers,
-  }) : answers = answers ?? [EditorAnswer(), EditorAnswer()];
+  }) : answers = answers ?? [EditorAnswer(), EditorAnswer(), EditorAnswer(), EditorAnswer()];
 
   ent_question.Question toEntity({String? quizId}) => ent_question.Question(
         id: id,

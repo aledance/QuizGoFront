@@ -329,7 +329,16 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Preguntas', style: TextStyle(fontWeight: FontWeight.bold)),
-                        TextButton.icon(onPressed: () { _controller.addQuestion(); _setupQuestionControllers(); }, icon: const Icon(Icons.add), label: const Text('Añadir')),
+                        TextButton.icon(
+                          onPressed: () {
+                            _controller.addQuestion();
+                            setState(() {
+                              _setupQuestionControllers();
+                            });
+                          },
+                          icon: const Icon(Icons.add),
+                          label: const Text('Añadir'),
+                        ),
                       ],
                     ),
 
@@ -513,7 +522,16 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: ElevatedButton.icon(onPressed: () { _controller.addQuestion(); _setupQuestionControllers(); }, icon: const Icon(Icons.add), label: const Text('Añadir pregunta')),
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          _controller.addQuestion();
+                          setState(() {
+                            _setupQuestionControllers();
+                          });
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text('Añadir pregunta'),
+                      ),
                     ),
                     Expanded(
                       child: ListView.builder(
