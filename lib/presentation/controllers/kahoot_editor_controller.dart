@@ -148,9 +148,15 @@ class KahootEditorController extends ChangeNotifier {
       editor.author = Author(authorId: _fallbackAuthorId, name: editor.author.name);
     }
 
+    // Normalize top-level optional fields: empty string -> null
+    if (editor.themeId != null && editor.themeId!.trim().isEmpty) editor.themeId = null;
+    if (editor.coverImageId != null && editor.coverImageId!.trim().isEmpty) editor.coverImageId = null;
+    if (editor.category != null && editor.category!.trim().isEmpty) editor.category = null;
+    if (editor.status != null && editor.status!.trim().isEmpty) editor.status = null;
+
     // Validate themeId: backend expects a UUID v4 or null
     final themeId = editor.themeId;
-    if (themeId != null && themeId.isNotEmpty) {
+    if (themeId != null) {
       final uuidV4 = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$');
       if (!uuidV4.hasMatch(themeId)) {
         // Invalid themeId -> drop it to avoid server validation error
@@ -160,10 +166,10 @@ class KahootEditorController extends ChangeNotifier {
 
     // Normalize question and answer fields: convert empty strings to null for optional fields
     for (var q in editor.questions) {
-      if (q.mediaId != null && q.mediaId!.isEmpty) q.mediaId = null;
+      if (q.mediaId != null && q.mediaId!.trim().isEmpty) q.mediaId = null;
       for (var a in q.answers) {
-        if (a.mediaId != null && a.mediaId!.isEmpty) a.mediaId = null;
-        if (a.text != null && a.text!.isEmpty) a.text = null;
+        if (a.mediaId != null && a.mediaId!.trim().isEmpty) a.mediaId = null;
+        if (a.text != null && a.text!.trim().isEmpty) a.text = null;
       }
     }
   }

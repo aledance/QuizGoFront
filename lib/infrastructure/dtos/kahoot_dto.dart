@@ -49,17 +49,18 @@ class KahootDto {
   Map<String, dynamic> toJsonRequest({required String authorId}) {
     final Map<String, dynamic> data = {
       'authorId': authorId,
-      'author': {'authorId': authorId, 'name': author['name'] ?? ''},
       'title': title,
       'description': description,
       'visibility': visibility,
       'questions': questions.map((q) => q.toJson()).toList(),
     };
-    // Always include these keys so the backend receives the expected schema.
-    data['coverImageId'] = coverImageId;
-    data['category'] = category;
-    data['status'] = status;
-    data['themeId'] = themeId;
+    // Only include optional fields if they are not null
+    if (coverImageId != null) data['coverImageId'] = coverImageId;
+    if (themeId != null) data['themeId'] = themeId;
+    
+    // Provide defaults if null to avoid backend 500s
+    data['category'] = category ?? 'General';
+    data['status'] = status ?? 'draft';
 
     return data;
   }

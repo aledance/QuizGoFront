@@ -15,7 +15,9 @@ class KahootRemoteDataSource {
     final uri = Uri.parse('$baseUrl/kahoots');
     final authorId = dto.author['authorId'] as String? ?? '';
     try {
-      final res = await client.post(uri, headers: {'Content-Type': 'application/json'}, body: jsonEncode(dto.toJsonRequest(authorId: authorId)));
+      final body = jsonEncode(dto.toJsonRequest(authorId: authorId));
+      print('DEBUG: createKahoot body: $body');
+      final res = await client.post(uri, headers: {'Content-Type': 'application/json'}, body: body);
       if (res.statusCode == 201) {
         return KahootDto.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
       }
@@ -33,7 +35,9 @@ class KahootRemoteDataSource {
     final uri = Uri.parse('$baseUrl/kahoots/$kahootId');
     final authorId = dto.author['authorId'] as String? ?? '';
     try {
-      final res = await client.put(uri, headers: {'Content-Type': 'application/json'}, body: jsonEncode(dto.toJsonRequest(authorId: authorId)));
+      final body = jsonEncode(dto.toJsonRequest(authorId: authorId));
+      print('DEBUG: updateKahoot body: $body');
+      final res = await client.put(uri, headers: {'Content-Type': 'application/json'}, body: body);
       if (res.statusCode == 200) {
         return KahootDto.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
       }
