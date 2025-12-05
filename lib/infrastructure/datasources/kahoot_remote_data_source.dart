@@ -9,7 +9,7 @@ class KahootRemoteDataSource {
   final String baseUrl;
 
   KahootRemoteDataSource({required this.client, String? baseUrl})
-      : baseUrl = baseUrl ?? (Platform.isAndroid ? 'http://10.0.2.2:3000' : 'http://localhost:3000');
+      : baseUrl = baseUrl ?? 'https://backcomun-production.up.railway.app';
 
   Future<KahootDto> createKahoot(KahootDto dto) async {
     final uri = Uri.parse('$baseUrl/kahoots');
