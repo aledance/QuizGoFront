@@ -36,6 +36,7 @@ class QuizDetailPage extends StatelessWidget {
                   Text('Creado: ${quiz.createdAt.toLocal().toString().split('.').first}', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                   const SizedBox(height: 20),
                   SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () {}, child: const Text('Iniciar Kahoot'))),
+                  const SizedBox(height: 8),
                 ],
               ),
             )
@@ -44,4 +45,6 @@ class QuizDetailPage extends StatelessWidget {
       ),
     );
   }
+
+  // NOTE: challenge presentation removed; no service created here.
 }

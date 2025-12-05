@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../components/categories_grid.dart';
 import '../components/channel_cards_carousel.dart';
 import '../data/categories_data.dart';
+import '../data/api_simulation.dart';
 import 'kahoot_editor_page.dart';
+import 'kahoot_challenge_prototype.dart';
 import 'session_page.dart';
 import 'notifications_page.dart';
 import 'create_study_group_page.dart';
@@ -17,18 +19,39 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<Map<String, dynamic>> _userGroups;
+  final _api = ApiSimulation();
+  List<Map<String, dynamic>> _userGroups = [];
+  List<CategoryItem> _categories = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // initialize from the static mocks
-    _userGroups = _mockStudyGroups.map((g) {
-      final membersList = List.generate(g.members.clamp(1, 12), (i) => 'Usuario ${i + 1}');
-      final messages = List.generate(2, (i) => {'from': membersList[i % membersList.length], 'text': 'Último mensaje ${i + 1} del grupo', 'date': DateTime.now().subtract(Duration(minutes: (i + 1) * 5)).toIso8601String()});
-      return {'name': g.name, 'members': g.members, 'description': 'Grupo de estudio sobre ${g.name}', 'membersList': membersList, 'messages': messages};
-    }).toList();
+    _loadData();
   }
+
+  Future<void> _loadData() async {
+    try {
+      final groups = await _api.getUserGroups();
+      final categories = await _api.getCategories();
+      if (mounted) {
+        setState(() {
+          _userGroups = groups;
+          _categories = categories;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+// Presentation: challenge UI removed — revert to previous behavior (no service calls here)
 
   Future<void> _handleCreateGroup() async {
     final res = await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CreateStudyGroupPage()));
@@ -43,7 +66,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final categories = kDefaultCategories;
+    
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final categories = _categories;
     final createHandler = widget.onCreateTap ?? () {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const KahootEditorPage()),
@@ -117,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                   _StudyGroupsSection(groups: _userGroups, onCreate: _handleCreateGroup),
                   const SizedBox(height: 24),
                   _SectionHeader(title: 'Explora más formas de jugar'),
-                  _PurplePromo(onPressed: () {}),
+                  _PurplePromo(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const KahootChallengePrototype()))),
                   const SizedBox(height: 24),
                 ],
               ),

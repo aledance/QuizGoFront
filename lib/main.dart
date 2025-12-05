@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -21,5 +22,23 @@ class DevHttpOverrides extends HttpOverrides {
 
 void main() {
   HttpOverrides.global = DevHttpOverrides();
-  runApp(const presentation.PresentationApp());
+
+  // Global error handling to capture uncaught exceptions and print full stack
+  FlutterError.onError = (FlutterErrorDetails details) {
+    // Flutter framework errors
+    FlutterError.presentError(details);
+    Zone.current.handleUncaughtError(details.exception, details.stack ?? StackTrace.current);
+  };
+
+  runZonedGuarded(() {
+    runApp(const presentation.PresentationApp());
+  }, (error, stack) {
+    // Print stacktrace so user can paste it here
+    // In release you might report this to a logging backend
+    // Keep minimal handling to avoid crashing silently
+    // ignore: avoid_print
+    print('Uncaught error: $error');
+    // ignore: avoid_print
+    print(stack);
+  });
 }
