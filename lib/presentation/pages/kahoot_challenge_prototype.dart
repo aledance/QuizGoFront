@@ -1,6 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+class ChallengeSession {
+  static final ChallengeSession _instance = ChallengeSession._internal();
+  factory ChallengeSession() => _instance;
+  ChallengeSession._internal();
+
+  String? nickname;
+  String? pin;
+  String? playerId;
+  String? playerToken;
+  bool get isJoined => playerId != null && playerToken != null;
+  
+  void clear() {
+    nickname = null;
+    pin = null;
+    playerId = null;
+    playerToken = null;
+  }
+}
+
 class KahootChallengePrototype extends StatefulWidget {
   const KahootChallengePrototype({Key? key}) : super(key: key);
 
@@ -63,7 +82,9 @@ class _KahootChallengePrototypeState extends State<KahootChallengePrototype> {
       case 'create':
         return const CreateChallengeUI();
       case 'join':
-        return const JoinChallengeUI();
+        return JoinChallengeUI(
+          onEnterChallenge: () => setState(() => screen = 'answer'),
+        );
       case 'answer':
         return const AnswerUI();
       case 'ranking':
@@ -94,11 +115,12 @@ class _CreateChallengeUIState extends State<CreateChallengeUI> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Crear Reto', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Crear Reto', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
 
             // Kahoot selector (friendly title, hides UUID)
             GestureDetector(
@@ -178,13 +200,15 @@ class _CreateChallengeUIState extends State<CreateChallengeUI> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 // ------------------ UNIRSE A CHALLENGE ------------------
 class JoinChallengeUI extends StatefulWidget {
-  const JoinChallengeUI({Key? key}) : super(key: key);
+  final VoidCallback? onEnterChallenge;
+  const JoinChallengeUI({Key? key, this.onEnterChallenge}) : super(key: key);
 
   @override
   State<JoinChallengeUI> createState() => _JoinChallengeUIState();
@@ -194,9 +218,14 @@ class _JoinChallengeUIState extends State<JoinChallengeUI> {
   final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _pinController = TextEditingController();
   bool _joining = false;
-  bool _joined = false;
-  String? _playerId;
-  String? _playerToken;
+  
+  @override
+  void initState() {
+    super.initState();
+    final session = ChallengeSession();
+    if (session.nickname != null) _nicknameController.text = session.nickname!;
+    if (session.pin != null) _pinController.text = session.pin!;
+  }
 
   @override
   void dispose() {
@@ -207,12 +236,15 @@ class _JoinChallengeUIState extends State<JoinChallengeUI> {
 
   @override
   Widget build(BuildContext context) {
+    final session = ChallengeSession();
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: _joined ? _buildJoined(context) : _buildForm(context),
+        child: SingleChildScrollView(
+          child: session.isJoined ? _buildJoined(context) : _buildForm(context),
+        ),
       ),
     );
   }
@@ -248,35 +280,51 @@ class _JoinChallengeUIState extends State<JoinChallengeUI> {
   }
 
   Widget _buildJoined(BuildContext context) {
-    final maskedToken = _playerToken == null ? '' : _playerToken!.replaceRange(4, _playerToken!.length - 4, '...');
+    final session = ChallengeSession();
+    final token = session.playerToken ?? '';
+    final maskedToken = token.length > 8 ? token.replaceRange(4, token.length - 4, '...') : token;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Bienvenido', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        Text('Jugador: ${_nicknameController.text}'),
+        Text('Jugador: ${session.nickname}'),
         const SizedBox(height: 8),
-        Text('ID de jugador: ${_playerId ?? ''}'),
+        Text('Identificador: ${session.playerId ?? ''}'),
         const SizedBox(height: 8),
         Row(children: [
-          Expanded(child: Text('Token: $maskedToken', overflow: TextOverflow.ellipsis)),
+          Expanded(child: Text('Código de acceso: $maskedToken', overflow: TextOverflow.ellipsis)),
             IconButton(
               icon: const Icon(Icons.copy),
-              onPressed: _playerToken == null
+              onPressed: token.isEmpty
                   ? null
                   : () async {
-                      await Clipboard.setData(ClipboardData(text: _playerToken!));
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Token copiado')));
+                      await Clipboard.setData(ClipboardData(text: token));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Código copiado')));
                     },
             )
         ]),
         const SizedBox(height: 12),
         FilledButton(
           onPressed: () {
-            // Placeholder: navigate to the challenge view or return to prototype
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Entrando al reto (simulado)')));
+            if (widget.onEnterChallenge != null) {
+              widget.onEnterChallenge!();
+            }
           },
           child: const Text('Entrar al reto'),
+        ),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              session.clear();
+              _nicknameController.clear();
+              _pinController.clear();
+            });
+          },
+          child: const Text('Salir del reto'),
         ),
       ],
     );
@@ -299,16 +347,19 @@ class _JoinChallengeUIState extends State<JoinChallengeUI> {
       await Future.delayed(const Duration(milliseconds: 400));
       final pid = 'player-${DateTime.now().millisecondsSinceEpoch.toString().substring(9)}';
       final token = 'tok-${DateTime.now().millisecondsSinceEpoch}';
-      setState(() {
-        _playerId = pid;
-        _playerToken = token;
-        _joined = true;
-      });
+      
+      final session = ChallengeSession();
+      session.nickname = nickname;
+      session.pin = pin;
+      session.playerId = pid;
+      session.playerToken = token;
+
+      setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Unido al reto (simulado)')));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     } finally {
-      setState(() => _joining = false);
+      if (mounted) setState(() => _joining = false);
     }
   }
 }
