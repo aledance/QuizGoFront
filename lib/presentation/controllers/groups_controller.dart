@@ -36,9 +36,9 @@ class GroupsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Group?> createGroup(String name) async {
+  Future<Group?> createGroup(String name, {String? imagePath}) async {
     try {
-      final g = await createGroupUseCase(name);
+      final g = await createGroupUseCase(name, imagePath: imagePath);
       groups.insert(0, g);
       notifyListeners();
       return g;

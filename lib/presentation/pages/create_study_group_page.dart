@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CreateStudyGroupPage extends StatefulWidget {
   const CreateStudyGroupPage({super.key});
@@ -9,7 +11,17 @@ class CreateStudyGroupPage extends StatefulWidget {
 
 class _CreateStudyGroupPageState extends State<CreateStudyGroupPage> {
   final TextEditingController _nameCtrl = TextEditingController();
-  bool _hasImage = false;
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _imageFile = File(picked.path);
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -56,10 +68,7 @@ class _CreateStudyGroupPageState extends State<CreateStudyGroupPage> {
 
                             // Image placeholder
                             GestureDetector(
-                              onTap: () {
-                                // placeholder for image picker
-                                setState(() => _hasImage = !_hasImage);
-                              },
+                              onTap: _pickImage,
                               child: Container(
                                 width: 220,
                                 height: 160,
@@ -67,9 +76,12 @@ class _CreateStudyGroupPageState extends State<CreateStudyGroupPage> {
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(color: scheme.onSurface.withOpacity(0.12)),
                                   color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1F1F1F) : Colors.grey[100],
+                                  image: _imageFile != null
+                                      ? DecorationImage(image: FileImage(_imageFile!), fit: BoxFit.cover)
+                                      : null,
                                 ),
-                                child: _hasImage
-                                    ? const Center(child: Icon(Icons.photo, size: 48))
+                                child: _imageFile != null
+                                    ? null
                                     : Center(
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
@@ -120,6 +132,7 @@ class _CreateStudyGroupPageState extends State<CreateStudyGroupPage> {
                                               'name': _nameCtrl.text.trim(),
                                               'members': 1,
                                               'description': 'Grupo de estudio creado recientemente',
+                                              'imagePath': _imageFile?.path,
                                             });
                                           },
                                     style: FilledButton.styleFrom(

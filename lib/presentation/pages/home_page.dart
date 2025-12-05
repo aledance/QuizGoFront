@@ -1,7 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
-import 'package:flutter_application_1/presentation/services/reports_service.dart';
 import 'package:flutter_application_1/infrastructure/dtos/session_report_dto.dart';
 import '../components/categories_grid.dart';
 import '../components/channel_cards_carousel.dart';
@@ -16,8 +15,7 @@ import 'study_groups_page.dart';
 import 'groups_page.dart';
 
 // Infrastructure + usecases imports to create a quick wiring point from Home
-import '../../infrastructure/services/groups_api.dart';
-import '../../infrastructure/repositories/group_repository_impl.dart';
+import '../../infrastructure/repositories/simulated_group_repository.dart';
 import '../../application/usecases/get_groups_usecase.dart';
 import '../../application/usecases/create_group_usecase.dart';
 import '../../application/usecases/join_group_usecase.dart';
@@ -293,17 +291,6 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _StudyGroup {
-  final String name;
-  final int members;
-  const _StudyGroup({required this.name, required this.members});
-}
-
-const _mockStudyGroups = [
-  _StudyGroup(name: 'Grupo de Ciencias', members: 12),
-  _StudyGroup(name: 'Historia Universal', members: 18),
-];
-
 class _StudyGroupsSection extends StatelessWidget {
   final List<Map<String, dynamic>> groups;
   final Future<void> Function()? onCreate;
@@ -322,9 +309,8 @@ class _StudyGroupsSection extends StatelessWidget {
               const Spacer(),
               TextButton(
                 onPressed: () {
-                  // Navegar a la interfaz completa de Grupos (usa el API y repo local).
-                  final api = GroupsApi(baseUrl: 'http://localhost:8080', token: '', client: http.Client());
-                  final repo = GroupRepositoryImpl(api: api);
+                  // Navegar a la interfaz completa de Grupos (usa el repo simulado).
+                  final repo = SimulatedGroupRepository();
                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => GroupsPage(
                         getGroupsUseCase: GetGroupsUseCase(repo),
                         createGroupUseCase: CreateGroupUseCase(repo),

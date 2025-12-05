@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/group.dart';
@@ -50,6 +51,18 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (widget.group.imageUrl != null)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: widget.group.imageUrl!.startsWith('http')
+                        ? NetworkImage(widget.group.imageUrl!)
+                        : FileImage(File(widget.group.imageUrl!)) as ImageProvider,
+                  ),
+                ),
+              ),
             Text('ID: ${widget.group.id}', style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 8),
             Text('Miembros: ${widget.group.memberCount}'),

@@ -5,6 +5,7 @@ class Group {
   final int memberCount;
   final DateTime createdAt;
   final String? description;
+  final String? imageUrl;
 
   Group({
     required this.id,
@@ -13,5 +14,6 @@ class Group {
     required this.memberCount,
     required this.createdAt,
     this.description,
+    this.imageUrl,
   });
 }

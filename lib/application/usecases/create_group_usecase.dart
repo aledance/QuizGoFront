@@ -5,5 +5,5 @@ class CreateGroupUseCase {
   final GroupRepository repository;
   CreateGroupUseCase(this.repository);
 
-  Future<Group> call(String name) async => repository.createGroup(name);
+  Future<Group> call(String name, {String? imagePath}) async => repository.createGroup(name, imagePath: imagePath);
 }

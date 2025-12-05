@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../application/usecases/create_group_usecase.dart';
@@ -7,6 +8,7 @@ import '../../application/usecases/get_leaderboard_usecase.dart';
 import '../../domain/entities/group.dart';
 import '../controllers/groups_controller.dart';
 import 'group_detail_page.dart';
+import 'create_study_group_page.dart';
 
 class GroupsPage extends StatefulWidget {
   final GetGroupsUseCase getGroupsUseCase;
@@ -47,75 +49,64 @@ class _GroupsPageState extends State<GroupsPage> {
     super.dispose();
   }
 
-  Future<void> _showCreateDialog() async {
-    final nameCtrl = TextEditingController();
-    final result = await showDialog<String?>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Crear Grupo'),
-        content: TextField(
-          controller: nameCtrl,
-          decoration: const InputDecoration(labelText: 'Nombre del grupo'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancelar')),
-          ElevatedButton(
-            onPressed: () => Navigator.of(ctx).pop(nameCtrl.text.trim()),
-            child: const Text('Crear'),
-          ),
-        ],
-      ),
+  void _showCreateDialog() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CreateStudyGroupPage()),
     );
 
-    if (result != null && result.isNotEmpty) {
-      final created = await controller.createGroup(result);
-      if (created != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-          const Icon(Icons.check_circle_outline, color: Colors.white),
-          const SizedBox(width: 8),
-            Expanded(
-            child: RichText(
-              text: TextSpan(
-              style: const TextStyle(color: Colors.white),
-              children: <TextSpan>[
-                const TextSpan(text: 'Grupo "'),
-                TextSpan(
-                  text: created.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-                const TextSpan(text: '" creado con éxito.'),
-              ],
+    if (result != null && result is Map) {
+      final name = result['name'] as String;
+      final imagePath = result['imagePath'] as String?;
+      
+      if (name.isNotEmpty) {
+        final created = await controller.createGroup(name, imagePath: imagePath);
+        
+        if (created != null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        style: const TextStyle(color: Colors.white),
+                        children: <TextSpan>[
+                          const TextSpan(text: 'Grupo "'),
+                          TextSpan(
+                            text: created.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
+                          const TextSpan(text: '" creado con éxito.'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.green.shade600,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              action: SnackBarAction(
+                label: 'VER',
+                textColor: Colors.white,
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => GroupDetailPage(
+                      group: created,
+                      getLeaderboardUseCase: widget.getLeaderboardUseCase,
+                    ),
+                  ));
+                },
               ),
             ),
-            ),
-              ],
-            ),
-            backgroundColor: Colors.green.shade600,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            action: SnackBarAction(
-              label: 'VER',
-              textColor: Colors.white,
-              onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => GroupDetailPage(
-              group: created,
-              getLeaderboardUseCase: widget.getLeaderboardUseCase,
-            ),
-          ));
-              },
-            ),
-          ),
-        );
-        // Optionally navigate to detail
-        // Navigator.of(context).push(MaterialPageRoute(builder: (_) => GroupDetailPage(group: created, getLeaderboardUseCase: widget.getLeaderboardUseCase)));
-      } else {
-        final err = controller.error ?? 'No se pudo crear el grupo';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $err')));
+          );
+        } else if (controller.error != null && mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${controller.error}')));
+        }
       }
     }
   }
@@ -171,7 +162,19 @@ class _GroupsPageState extends State<GroupsPage> {
               separatorBuilder: (_, __) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final Group g = controller.groups[index];
+                ImageProvider? imageProvider;
+                if (g.imageUrl != null) {
+                  if (g.imageUrl!.startsWith('http')) {
+                    imageProvider = NetworkImage(g.imageUrl!);
+                  } else {
+                    imageProvider = FileImage(File(g.imageUrl!));
+                  }
+                }
+
                 return ListTile(
+                  leading: imageProvider != null
+                      ? CircleAvatar(backgroundImage: imageProvider)
+                      : CircleAvatar(child: Text(g.name.isNotEmpty ? g.name.substring(0, 1).toUpperCase() : '?')),
                   title: Text(g.name),
                   subtitle: Text('Miembros: ${g.memberCount} • Rol: ${g.role}'),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(

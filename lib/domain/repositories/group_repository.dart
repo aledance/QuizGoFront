@@ -3,7 +3,7 @@ import '../entities/leaderboard.dart';
 
 abstract class GroupRepository {
   Future<List<Group>> getGroups();
-  Future<Group> createGroup(String name);
+  Future<Group> createGroup(String name, {String? imagePath});
   Future<Group> patchGroup(String groupId, {String? name, String? description});
   Future<void> deleteGroup(String groupId);
   Future<void> deleteMember(String groupId, String memberId);

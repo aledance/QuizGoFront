@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 import '../../domain/entities/group.dart';
 import '../../domain/entities/leaderboard.dart';
 import '../../domain/repositories/group_repository.dart';
@@ -25,7 +23,7 @@ class GroupRepositoryImpl implements GroupRepository {
   }
 
   @override
-  Future<Group> createGroup(String name) async {
+  Future<Group> createGroup(String name, {String? imagePath}) async {
     final resp = await api.createGroup(GroupCreateRequest(name: name));
     return Group(
       id: resp.id,
