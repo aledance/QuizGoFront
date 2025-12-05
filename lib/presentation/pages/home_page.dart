@@ -138,26 +138,21 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          Padding(
+            Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 120),
-                  child: FilledButton(
-                    onPressed: () {},
-                    style: FilledButton.styleFrom(backgroundColor: const Color(0xFF00A88C), padding: const EdgeInsets.symmetric(horizontal: 12)),
-                    child: const Text('Actualizar', overflow: TextOverflow.ellipsis),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsPage()));
-                  },
-                  icon: const Icon(Icons.notifications_none),
-                ),
+              IconButton(
+                onPressed: _loadData,
+                icon: const Icon(Icons.refresh),
+              ),
+              IconButton(
+                onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsPage()));
+                },
+                icon: const Icon(Icons.notifications_none),
+              ),
               ],
             ),
           ),
