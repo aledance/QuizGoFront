@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+
 
 import 'package:http/http.dart' as http;
 import '../dtos/kahoot_dto.dart';
@@ -24,8 +24,7 @@ class KahootRemoteDataSource {
       final reqId = res.headers['x-railway-request-id'] ?? res.headers['x-request-id'] ?? '';
       throw Exception('Failed to create kahoot: ${res.statusCode} ${res.body} (request-id: $reqId)');
     } catch (e, st) {
-      // Provide clearer error for frontend / web (CORS / network) and log stack for debugging
-      // ignore: avoid_print
+      
       print('createKahoot error: $e\n$st');
       throw Exception('Network/create error: $e');
     }
@@ -44,7 +43,7 @@ class KahootRemoteDataSource {
       final reqId = res.headers['x-railway-request-id'] ?? res.headers['x-request-id'] ?? '';
       throw Exception('Failed to update kahoot: ${res.statusCode} ${res.body} (request-id: $reqId)');
     } catch (e, st) {
-      // ignore: avoid_print
+      
       print('updateKahoot error: $e\n$st');
       throw Exception('Network/update error: $e');
     }
@@ -60,7 +59,7 @@ class KahootRemoteDataSource {
       final reqId = res.headers['x-railway-request-id'] ?? res.headers['x-request-id'] ?? '';
       throw Exception('Failed to get kahoot: ${res.statusCode} ${res.body} (request-id: $reqId)');
     } catch (e, st) {
-      // ignore: avoid_print
+      
       print('getKahootById error: $e\n$st');
       throw Exception('Network/get error: $e');
     }

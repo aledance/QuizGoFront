@@ -21,6 +21,8 @@ import '../../application/usecases/create_group_usecase.dart';
 import '../../application/usecases/join_group_usecase.dart';
 import '../../application/usecases/get_leaderboard_usecase.dart';
 
+/// Página principal de la aplicación (Dashboard).
+/// Muestra un resumen de la actividad del usuario, grupos, categorías y acceso rápido a crear contenido.
 class HomePage extends StatefulWidget {
   final VoidCallback? onCreateTap;
   const HomePage({super.key, this.onCreateTap});
@@ -30,7 +32,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // Simulación de API para datos de demostración
   final _api = ApiSimulation();
+  
+  // Estado local para grupos y categorías
   List<Map<String, dynamic>> _userGroups = [];
   List<CategoryItem> _categories = [];
   bool _isLoading = true;
@@ -41,6 +46,7 @@ class _HomePageState extends State<HomePage> {
     _loadData();
   }
 
+  /// Carga los datos iniciales (grupos y categorías) simulando una petición de red.
   Future<void> _loadData() async {
     try {
       final groups = await _api.getUserGroups();
