@@ -122,7 +122,6 @@ class _CreateChallengeUIState extends State<CreateChallengeUI> {
               const Text('Crear Reto', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
 
-            // Kahoot selector (friendly title, hides UUID)
             GestureDetector(
               onTap: () async {
                 final nameController = TextEditingController();
@@ -166,7 +165,7 @@ class _CreateChallengeUIState extends State<CreateChallengeUI> {
             ),
 
             const SizedBox(height: 16),
-            // Kahoot-style CTA
+            
             SizedBox(
               width: double.infinity,
               child: FilledButton(

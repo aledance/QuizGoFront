@@ -174,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   _SectionHeader(title: 'Tus kahoots'),
                   const SizedBox(height: 12),
-                  // Demo: Reports panel (H10) - shows session report ranking and question analysis
+                  
                   const _ReportsDemoSection(),
                   _QuickCard(onCreateTap: createHandler),
                   const SizedBox(height: 24),
