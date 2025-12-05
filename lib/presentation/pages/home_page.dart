@@ -129,18 +129,13 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              FilledButton(
-                onPressed: () {},
-                style: FilledButton.styleFrom(backgroundColor: const Color(0xFF00A88C), padding: const EdgeInsets.symmetric(horizontal: 12)),
-                child: const Text('Actualizar'),
-              ),
               const SizedBox(width: 8),
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsPage()));
-                },
-                icon: const Icon(Icons.notifications_none),
-              ),
+              // IconButton(
+              //   onPressed: () {
+              //     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsPage()));
+              //   },
+              //   icon: const Icon(Icons.refresh),
+              // ),
             ],
           ),
         ),
