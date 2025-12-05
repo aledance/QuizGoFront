@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:flutter_application_1/presentation/services/reports_service.dart';
+import 'package:flutter_application_1/infrastructure/dtos/session_report_dto.dart';
 import '../components/categories_grid.dart';
 import '../components/channel_cards_carousel.dart';
 import '../data/categories_data.dart';
@@ -97,7 +99,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: scheme.surface,
         elevation: 0,
         title: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
               GestureDetector(
@@ -118,6 +120,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(
                       'Hola, Team Morado',
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
@@ -141,6 +144,31 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 120),
+                  child: FilledButton(
+                    onPressed: () {},
+                    style: FilledButton.styleFrom(backgroundColor: const Color(0xFF00A88C), padding: const EdgeInsets.symmetric(horizontal: 12)),
+                    child: const Text('Actualizar', overflow: TextOverflow.ellipsis),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsPage()));
+                  },
+                  icon: const Icon(Icons.notifications_none),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [
@@ -151,6 +179,9 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _SectionHeader(title: 'Tus kahoots'),
+                  const SizedBox(height: 12),
+                  // Demo: Reports panel (H10) - shows session report ranking and question analysis
+                  const _ReportsDemoSection(),
                   _QuickCard(onCreateTap: createHandler),
                   const SizedBox(height: 24),
                   _CategorySlider(items: categories),
@@ -464,6 +495,155 @@ class _CategorySlider extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ReportsDemoSection extends StatefulWidget {
+  const _ReportsDemoSection({Key? key}) : super(key: key);
+
+  @override
+  State<_ReportsDemoSection> createState() => _ReportsDemoSectionState();
+}
+
+class _ReportsDemoSectionState extends State<_ReportsDemoSection> {
+  bool _loading = false;
+  String? _error;
+  SessionReportDto? _report;
+
+  // For demo purposes use a placeholder baseUrl. Replace with your API base URL.
+  final ReportsService _service = ReportsService.create(baseUrl: 'https://api.example.com');
+
+  Future<void> _loadReport() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+      _report = null;
+    });
+    try {
+      // Replace the sessionId below with a real session id to fetch a real report
+      final r = await _service.getSessionReport.call('demo-session-id');
+      setState(() {
+        _report = r;
+      });
+    } catch (e) {
+      // Store the error message but provide fallback demo data so layout can be inspected
+      setState(() {
+        _error = e.toString();
+        _report = SessionReportDto(
+          reportId: 'local-demo',
+          sessionId: 'local-session',
+          title: 'Demo: informe local (fallback)',
+          executionDate: DateTime.now(),
+          playerRanking: List.generate(8, (i) => PlayerRankingDto(position: i + 1, username: 'Jugador ${i + 1}', score: (9000 - i * 500), correctAnswers: 8 - (i % 3))),
+          questionAnalysis: List.generate(6, (i) => QuestionAnalysisDto(questionIndex: i, questionText: 'Pregunta de ejemplo ${i + 1}', correctPercentage: 0.6 - (i * 0.05).clamp(0.0, 1.0))),
+        );
+      });
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(12),
+      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text('Informe de sesión (demo)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(width: 8),
+                  // allow the button to shrink if space is constrained
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 160),
+                    child: FilledButton(
+                      onPressed: _loading ? null : _loadReport,
+                      child: const Text('Cargar informe', overflow: TextOverflow.ellipsis),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (_loading) const Center(child: Padding(padding: EdgeInsets.all(8.0), child: CircularProgressIndicator())),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'Error: ${_error}',
+                    style: TextStyle(color: scheme.error),
+                    softWrap: true,
+                  ),
+                ),
+              if (_report != null) ...[
+                const SizedBox(height: 8),
+                Text('Título: ' + _report!.title, style: Theme.of(context).textTheme.titleSmall),
+                const SizedBox(height: 8),
+                Text('Fecha: ' + _report!.executionDate.toLocal().toString(), style: Theme.of(context).textTheme.bodySmall),
+                const SizedBox(height: 12),
+                Text('Ranking de jugadores', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Column(
+                  children: List.generate(_report!.playerRanking.length > 5 ? 5 : _report!.playerRanking.length, (index) {
+                    final p = _report!.playerRanking[index];
+                    return Column(
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(child: Text('${p.position}')),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(p.username, softWrap: true, overflow: TextOverflow.ellipsis)),
+                            const SizedBox(width: 12),
+                            Text('${p.score} pts'),
+                          ],
+                        ),
+                        if (index != (_report!.playerRanking.length > 5 ? 4 : _report!.playerRanking.length - 1)) const Divider(height: 8),
+                      ],
+                    );
+                  }),
+                ),
+                const SizedBox(height: 12),
+                Text('Análisis por pregunta', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(_report!.questionAnalysis.length > 5 ? 5 : _report!.questionAnalysis.length, (index) {
+                    final q = _report!.questionAnalysis[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Pregunta ${q.questionIndex + 1}: ' + q.questionText, style: Theme.of(context).textTheme.bodyMedium, softWrap: true, overflow: TextOverflow.visible),
+                          const SizedBox(height: 4),
+                          LinearProgressIndicator(value: q.correctPercentage, color: scheme.primary, backgroundColor: scheme.surfaceVariant),
+                          const SizedBox(height: 4),
+                          Text('Correctas: ${(q.correctPercentage * 100).toStringAsFixed(0)}%')
+                        ],
+                      ),
+                    );
+                  }),
+                ),
+                if ((_report!.playerRanking.length > 5) || (_report!.questionAnalysis.length > 5))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text('Mostrando los primeros 5 ítems. Actualiza para ver más.', style: Theme.of(context).textTheme.bodySmall),
+                  ),
+              ]
+            ],
+          ),
     );
   }
 }
