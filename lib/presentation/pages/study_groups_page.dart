@@ -138,32 +138,57 @@ class _StudyGroupDetailPageState extends State<StudyGroupDetailPage> {
 
   void _openAddMemberDialog() {
     final ctrl = TextEditingController();
-    showDialog(
+
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return AlertDialog(
-          title: const Text('Invitar usuario'),
-          content: TextField(
-            controller: ctrl,
-            decoration: const InputDecoration(hintText: 'Nombre o email del usuario'),
-            autofocus: true,
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancelar')),
-            ElevatedButton(
-              onPressed: () {
-                final text = ctrl.text.trim();
-                if (text.isEmpty) return;
-                setState(() {
-                  members.add({'name': text, 'avatar': ''});
-                  membersCount = membersCount + 1;
-                });
-                Navigator.of(ctx).pop();
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invitación enviada a $text')));
-              },
-              child: const Text('Invitar'),
+        return Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).dialogBackgroundColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             ),
-          ],
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Invitar usuario', style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: ctrl,
+                    decoration: const InputDecoration(hintText: 'Nombre o email del usuario'),
+                    autofocus: true,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(children: [
+                    Expanded(child: TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancelar'))),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final text = ctrl.text.trim();
+                          if (text.isEmpty) return;
+                          setState(() {
+                            members.add({'name': text, 'avatar': ''});
+                            membersCount = membersCount + 1;
+                          });
+                          Navigator.of(ctx).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invitación enviada a $text')));
+                        },
+                        child: const Text('Invitar'),
+                      ),
+                    ),
+                  ])
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
