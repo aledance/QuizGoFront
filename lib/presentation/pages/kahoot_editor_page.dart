@@ -67,7 +67,11 @@ class _KahootEditorPageState extends State<KahootEditorPage> {
         _setupQuestionControllers();
         setState(() {});
       }).catchError((e) {
-
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar el quiz: $e')),
+        );
+        Navigator.of(context).pop(); // Regresar si no se encuentra
       });
     }
   }
