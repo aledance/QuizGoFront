@@ -507,7 +507,7 @@ class _ReportsDemoSectionState extends State<_ReportsDemoSection> {
   SessionReportDto? _report;
 
   // For demo purposes use a placeholder baseUrl. Replace with your API base URL.
-  final ReportsService _service = ReportsService.create(baseUrl: 'https://api.example.com');
+  // final ReportsService _service = ReportsService.create(baseUrl: 'https://api.example.com');
 
   Future<void> _loadReport() async {
     setState(() {
@@ -516,23 +516,23 @@ class _ReportsDemoSectionState extends State<_ReportsDemoSection> {
       _report = null;
     });
     try {
-      // Replace the sessionId below with a real session id to fetch a real report
-      final r = await _service.getSessionReport.call('demo-session-id');
+      // Simulate network delay
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // Return simulated data directly
       setState(() {
-        _report = r;
-      });
-    } catch (e) {
-      // Store the error message but provide fallback demo data so layout can be inspected
-      setState(() {
-        _error = e.toString();
         _report = SessionReportDto(
           reportId: 'local-demo',
           sessionId: 'local-session',
-          title: 'Demo: informe local (fallback)',
+          title: 'Demo: informe local',
           executionDate: DateTime.now(),
           playerRanking: List.generate(8, (i) => PlayerRankingDto(position: i + 1, username: 'Jugador ${i + 1}', score: (9000 - i * 500), correctAnswers: 8 - (i % 3))),
           questionAnalysis: List.generate(6, (i) => QuestionAnalysisDto(questionIndex: i, questionText: 'Pregunta de ejemplo ${i + 1}', correctPercentage: 0.6 - (i * 0.05).clamp(0.0, 1.0))),
         );
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
       });
     } finally {
       setState(() {
